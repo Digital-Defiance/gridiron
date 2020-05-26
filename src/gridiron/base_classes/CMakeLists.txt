@@ -8,6 +8,9 @@ target_sources(gridiron
         gridiron.cpp ${CMAKE_SOURCE_DIR}/include/gridiron/base_classes/gridiron.hpp
         page.cpp ${CMAKE_SOURCE_DIR}/include/gridiron/base_classes/page.hpp
 )
-message(STATUS ${HTMLCXX_LIBRARIES})
 target_link_libraries(gridiron ${HTMLCXX_LIBRARIES})
 add_subdirectory(controls)
+
+# CONFIGURE GRIDIRON
+target_compile_definitions(gridiron PUBLIC GRIDIRON_XHTML_NS=${GRIDIRON_XHTML_NS})
+target_compile_definitions(gridiron PUBLIC GRIDIRON_HTML_DOCROOT="${GRIDIRON_HTML_DOCROOT}")

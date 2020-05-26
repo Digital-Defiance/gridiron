@@ -62,8 +62,9 @@ Page::Page(const char *frontpage) : Control(frontpage, NULL) {
     }
 
     // open the front-page
-    std::ifstream file(GRIDIRON_HTML_DOCROOT + std::filesystem::path::preferred_separator + frontpage, std::ios_base::in);
-    if (!file.is_open()) throw gridexception(101, "unable to open front-end page");
+    const std::string fullPagePath = GridIron::pathToPage(frontpage);
+    std::ifstream file(fullPagePath, std::ios_base::in);
+    if (!file.is_open()) throw GridException(101, std::string("unable to open front-end page: ").append(fullPagePath).c_str());
 
     // base (control) class does not attempt to parse at all
 
@@ -74,7 +75,7 @@ Page::Page(const char *frontpage) : Control(frontpage, NULL) {
 
     if (filesize == 0) {
         file.close();
-        throw gridexception(103, "front-end file is empty");
+        throw GridException(103, "front-end file is empty");
     }
 
     // allocate mem
@@ -96,7 +97,7 @@ Page::Page(const char *frontpage) : Control(frontpage, NULL) {
     buffer = NULL;
 
     if (bytesread < filesize) {
-        throw gridexception(104, "unable to read front-end page");
+        throw GridException(104, "unable to read front-end page");
     }
 
     // add default registered variables
@@ -129,7 +130,7 @@ Page::parse() {
     bool firstpass = (_tree.size() == 0);        // have we already parsed this page?
 
     // _data contains the entire .html file, if given
-    if (_data.size() == 0) throw gridexception(105, "parse called when front-end page not given or empty");
+    if (_data.size() == 0) throw GridException(105, "parse called when front-end page not given or empty");
 
     // now get the htmlcxx parse tree of the page if we need it
     if (firstpass) {
@@ -286,7 +287,7 @@ Page::render() {
     std::string *datacontents;
     var_map::iterator m;
 
-    if (_data.size() == 0) throw gridexception(104, "render called when front-end page not given or empty");
+    if (_data.size() == 0) throw GridException(104, "render called when front-end page not given or empty");
     this->Page::parse();    // call 2nd pass
 
     // assemble page: start by rendering the first node.

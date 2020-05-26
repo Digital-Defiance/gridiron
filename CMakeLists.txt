@@ -107,9 +107,6 @@ target_link_libraries(gridiron-oatpp-lib
 
 add_definitions(-DOATPP_SWAGGER_RES_PATH="${OATPP_BASE_DIR}/bin/oatpp-swagger/res")
 
-# CONFIGURE GRIDIRON
-set(CMAKE_CXX_FLAGS "-DGRIDIRON_XHTML_NS=\"gi\" -DGRIDIRON_HTML_DOCROOT=\"${OATPP_BASE_DIR}/html\" ${CMAKE_CXX_FLAGS} ")
-
 ## add executables
 
 add_executable(crud-exe src/App.cpp)

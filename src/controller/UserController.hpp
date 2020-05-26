@@ -72,7 +72,6 @@ public:
     info->addResponse<String>(Status::CODE_200, "text/html");
   }
   ENDPOINT("GET", "/", root) {
-      std::cerr << "BLAH" << std::endl;
 
     GridIron::Page page("crud-exe/testapp.html");
     GridIron::controls::Label lblTest("lblTest", &page);

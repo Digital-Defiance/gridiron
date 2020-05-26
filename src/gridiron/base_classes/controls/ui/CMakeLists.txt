@@ -6,3 +6,7 @@ target_sources(gridironControls
 )
 add_dependencies(gridironControls gridiron)
 target_link_libraries(gridironControls gridiron)
+
+# CONFIGURE GRIDIRON
+target_compile_definitions(gridiron PUBLIC GRIDIRON_XHTML_NS=${GRIDIRON_XHTML_NS})
+target_compile_definitions(gridiron PUBLIC GRIDIRON_HTML_DOCROOT="${GRIDIRON_HTML_DOCROOT}")

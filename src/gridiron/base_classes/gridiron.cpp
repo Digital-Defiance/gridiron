@@ -18,8 +18,19 @@
 #include <cstdio>
 #include <iostream>
 #include <gridiron/base_classes/gridiron.hpp>
+#include <gridiron/base_classes/exceptions.hpp>
+#include <unistd.h>
+#include <limits.h>
+#include <boost/filesystem.hpp>
+#include <boost/dll.hpp>
 
 namespace GridIron {
+    const char *pathToPage(const char *frontpage) {
+        boost::filesystem::path boostPath = boost::dll::program_location().parent_path();
+
+        return boostPath.append(GRIDIRON_HTML_DOCROOT).append(frontpage).c_str();
+    }
+
     // in place, truncating trim (" abc d " -> "abc")
     void string_trunc_trim(std::string &in) {
         std::string::size_type idx;

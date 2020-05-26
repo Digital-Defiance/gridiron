@@ -48,14 +48,14 @@ namespace GridIron {
         _html_node = NULL;
 
         // we must have an ID- and only one instance of an id may exist on all controls under a page object
-        if (_id.length() == 0) throw gridexception(200, "no id specified");
+        if (_id.length() == 0) throw GridException(200, "no id specified");
 
         // find the page control if we have one, then look to see if the id is already registered
         _Page = GetPage();
         if (_Page != NULL) {
             // check page for existing controls with that id
             result = _Page->Find(id);
-            if (result != NULL) throw gridexception(201, "id already in use");
+            if (result != NULL) throw GridException(201, "id already in use");
 
             // register ourselves with the parent if we have one (pages dont)
             // parent will have a pointer to our id string to save mem and allow for changes

@@ -51,8 +51,8 @@ Label::~Label() {
 void
 Label::parse() {
     Page *_Page = GetPage();
-    if (_Page == NULL) throw gridexception(300, "Control must be attached to a page");
-    if (_html_node == NULL) throw gridexception(301, "HTML tag not found for this instance");
+    if (_Page == NULL) throw GridException(300, "Control must be attached to a page");
+    if (_html_node == NULL) throw GridException(301, "HTML tag not found for this instance");
 
     // if there are child nodes, that will be the text for the label, should not override any text that has already been set.
     // if _defaulttext == true, can override
