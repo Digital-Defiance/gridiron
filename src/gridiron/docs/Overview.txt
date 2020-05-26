@@ -1,0 +1,119 @@
+Overview
+======================================================
+
+The gridiron::Control class is the base of everything, even the Page class
+derives from it. The Control class maintains a heierarchy of Control objects.
+Every Control instance, except Page instance, knows its parent and children.
+
+To create an application, you must instantiate a Page class. The only argument
+is the html file, or NULL for a page with no template (referred to as front page herein).
+
+Front pages are just standard HTML/XHTML, and should contain (for it to be of
+any value) at least one of the following types of tags currently known
+(subject to change).
+
+
+
+
+
+Template Tag Replacement - Principle Types
+======================================================
+*NOTE* All tags are case sensitive.
+
+
+Variable Tags
+----------------------------
+<%=variable%>
+
+These tags will be directly replaced with the string contained in the
+variable referenced at render time. Variable names are alphanumeric and
+underscore only. The tag may not contain spaces unless you configure with
+--enable-vartag-spaces. The advantage in not allowing spaces prevents having
+to trim spaces off and results in a perhaps negligably faster, but simpler parsing.
+In a large page, this may add up.
+
+
+Control Tags (also see ControlTags.txt)
+----------------------------
+<gridiron::Type id="myid">contents/children/text/data</gridiron::Type>
+or
+<gridiron::Type id="myid" />
+
+for example:
+<gridiron::Label id="lbl1234">these are the contents</gridiron::Label>
+
+Control tags must correspond with a control instance of the correct type and
+ID, except in the case of autonomous tags, described shortly.
+
+
+Autonomous Tags (also see AutonomousTags.txt)
+----------------------------
+One term you'll see used a fair bit is an autonomous tag or control. This is a
+tag in the font page that automatically instantiates a control of the
+corresponding type, without (must not have) an existing C++ instance.
+
+Not all control types will support autonomous tags as it may not be logical.
+
+They're the same as Control Tags, with the exception that they'll
+automatically create the control instance if the type is registered, and
+automatically register some variables for replacement tag and C++ access.
+
+An autonomous tag uses the same syntax as a Control Tag, but adds the
+attribute auto="true" (setting auto="false" has no effect).
+
+For example, in the case of an autonomous label tag, it will register id_Text
+for access.
+<gridiron::Label id="lblAuto1234" auto="true">default text</gridiron::Label>
+<br><%=lblAuto1234%>
+
+will render to:
+default text
+default text
+
+Once text boxes are implemented, the variable value will be accessible after
+the postback.
+
+
+
+
+Creating a Page (A brief overview)
+======================================================
+
+The simplest program first creates a Page instance.
+Upon initialization, the front page (if supplied) is parsed (using Page::parse())
+and broken down into a tree of HTML nodes. Any autonomous tags will have their control
+instances created immediately. Standard Control Tags will be ignored.
+
+Conflicts in id's will result in errors and the page will not render.
+
+Once you have a page object, creating controls is as simple as giving them an ID
+and a parent. They will automatically register with the parent for parsing and
+rendering.
+
+Once your page object and all of your controls are created and
+values/attributes set as desired, just call Page::render() and the results
+will print to stdout.
+
+See testapp.cpp for a hello world example.
+
+Program Flow
+----------------------------
+As already mentioned, at instantiation of the page object, any autos will be
+brought to life and get their pointer to the corresponding HTML node that
+triggered it, mainly so the control knows where to find its data for
+Control::parse().
+
+Calling PageInstance.render() first calls Page::parse() again, which goes back
+through and this time pays attention to Standard Control Tags and pulls in the
+attributes from the template tag if they haven't already been set by the
+control's methods. After the second and final parse run, every control on the
+page will have it's render method called (most controls will call
+Control::parse() from Control::render() to pull in defaults, but this is not
+automatic if you're making a control) and the output will replace the original
+control tag upon output. At the very end of Page::render(), the variable tag
+replacement occurs, just before outputting to std::out.
+
+
+You should find the code well commented and fairly easy to read. Depending on
+your level of experience, however, some things may be a bit foreign and I hope
+to cover them in more detail.

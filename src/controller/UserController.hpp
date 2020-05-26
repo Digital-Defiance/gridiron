@@ -1,3 +1,18 @@
+/****************************************************************************************
+   * (C) Copyright 2009-2020
+   *    Jessica Mulein <jessica@mulein.com>
+   *
+   * Others will be credited if more developers join.
+   *
+   * License
+   *
+   * This code is licensed under the GPLv3.
+   * Please see COPYING in the root of this package for details.
+   *
+   * The following libraries are only linked in, and no code is based directly from them:
+   * htmlcxx is under the Apache 2.0 License
+   * Boost is under the Boost license
+   ***************************************************************************************/
 
 #ifndef UserController_hpp
 #define UserController_hpp
@@ -8,6 +23,13 @@
 #include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 #include "oatpp/core/macro/codegen.hpp"
 #include "oatpp/core/macro/component.hpp"
+
+#include <gridiron/base_classes/page.hpp>
+#include <gridiron/base_classes/controls/ui/label.hpp>
+// standard
+#include <iostream>
+#include <string>
+// htmlcxx
 
 /**
  *  EXAMPLE ApiController
@@ -50,17 +72,15 @@ public:
     info->addResponse<String>(Status::CODE_200, "text/html");
   }
   ENDPOINT("GET", "/", root) {
-    const char* html =
-    "<html lang='en'>"
-    "<head>"
-    "<meta charset=utf-8/>"
-    "</head>"
-    "<body>"
-    "<p>Hello CRUD example project!</p>"
-    "<a href='swagger/ui'>Checkout Swagger-UI page</a>"
-    "</body>"
-    "</html>";
-    auto response = createResponse(Status::CODE_200, html);
+      std::cerr << "BLAH" << std::endl;
+
+    GridIron::Page page("crud-exe/testapp.html");
+    GridIron::controls::Label lblTest("lblTest", &page);
+    page.RegisterVariable("lblTest_Text", lblTest.GetTextPtr());
+
+    lblTest.SetText("these contents were replaced");
+
+    auto response = createResponse(Status::CODE_200, page.render().c_str());
     response->putHeader(Header::CONTENT_TYPE, "text/html");
     return response;
   }
