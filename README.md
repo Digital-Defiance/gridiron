@@ -16,11 +16,23 @@ This project is using [oatpp](https://github.com/oatpp/oatpp) and [oatpp-swagger
 
 ```
 |- CMakeLists.txt                        // projects CMakeLists.txt
+|- include/
+|   |
+|   |- gridiron/                         // GridIron header files
+|   |   |- base_classes/                 // GridIron headers for core classes
+|   |       |- controls/                 // GridIron headers for custom controls
+|   |           |- ui/                   // GridIron headers for custom ui controls
+| 
 |- src/
 |   |
 |   |- controller/                       // Folder containing UserController where all endpoints are declared
 |   |- db/                               // Folder with database mock
 |   |- dto/                              // DTOs are declared here
+|   |- gridiron/                         // GridIron library root
+|   |    |- html/                        // GridIron HTML root for C++ pages
+|   |        |- base_classes/            // GridIron core library
+|   |            |- controls/            // GridIron Custom controls root
+|   |                |- ui/              // UI controls eg <gi:label>
 |   |- SwaggerComponent.hpp              // Swagger-UI config
 |   |- AppComponent.hpp                  // Service config
 |   |- App.cpp                           // main() is here
@@ -131,4 +143,4 @@ ENDPOINT("DELETE", "demo/api/users/{userId}", deleteUser,
   return createResponse(Status::CODE_200, "User successfully deleted");
 }  
 ```
-See /github-assets/crud-exe.png
+See /github-assets/crud-exe.png for example
