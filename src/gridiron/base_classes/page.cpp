@@ -65,7 +65,8 @@ Page::Page(const char *frontpage) : Control(frontpage, NULL) {
     const std::string fullPagePath = GridIron::pathToPage(frontpage);
     _htmlfilepath = fullPagePath;
     std::ifstream file(fullPagePath, std::ios_base::in);
-    if (!file.is_open()) throw GridException(101, std::string("unable to open front-end page: ").append(fullPagePath).c_str());
+    if (!file.is_open()) throw GridException(101, std::string("unable to open front-end page: ").append(
+                fullPagePath).c_str());
 
     // base (control) class does not attempt to parse at all
 
@@ -218,8 +219,8 @@ Page::parse() {
 
                         // try to create a control of this type. The control class must be registered with the factory.
                         // only classes that support autos should register.
-                        instance = g_controlfactory.CreateByType(tagType.c_str(), idresult.second.c_str(), (Control * )
-                        this);
+                        instance = g_controlfactory.CreateByType(tagType.c_str(), idresult.second.c_str(), (Control *)
+                                this);
 
                         //If we get an instance, it worked, if it didn't tough luck.
                         if (instance == NULL) {
@@ -263,7 +264,7 @@ Page::renderNode(tree<htmlnode>::sibling_iterator *thisnode, int level, std::str
 
             // if we found the control associated with this node, tell it to render
             // otherwise, print an error in its place
-            if (tmpcontrol != NULL) rendered .append(tmpcontrol->render());
+            if (tmpcontrol != NULL) rendered.append(tmpcontrol->render());
             else rendered.append("<!-- ERROR rendering control: no instance found -->");
 
         } else {

@@ -54,16 +54,18 @@ namespace GridIron {
         ~Page();
 
         virtual void parse();                                                // parse the underlying html
-        virtual std::string render();                                        // recursively render all children and output
+        virtual std::string
+        render();                                        // recursively render all children and output
         bool
         RegisterVariable(const std::string name, std::string *data);    // register a variable for front-page access
-        inline std::string * GetDataPtr() { return &_data; };                // return a pointer to the raw html file's data
+        inline std::string *
+        GetDataPtr() { return &_data; };                // return a pointer to the raw html file's data
         inline static const bool AllowAutonomous() { return false; }        // can't have an autonomous page class
         inline static const char *ClassType() { return "Page"; };            // we're a Page type
 
     protected:
         std::string _data;            // raw page data
-        tree <htmlnode> _tree;        // html tree
+        tree<htmlnode> _tree;        // html tree
         var_map _regvars;            // registered variables for frontpage access
         node_map _nodemap;            // registered nodes
         std::string _htmlfile;        // front page filename

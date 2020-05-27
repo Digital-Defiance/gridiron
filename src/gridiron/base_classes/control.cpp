@@ -30,7 +30,7 @@
 namespace GridIron {
 
     Control::Control(const char *id, Control *parent) {
-        Control * result = NULL;
+        Control *result = NULL;
         Page *_Page;
 
         // INITIALIZE VARIABLES

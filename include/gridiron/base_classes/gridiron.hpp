@@ -41,8 +41,7 @@ namespace GridIron {
     // htmlnode
     typedef htmlcxx::HTML::Node htmlnode;
 
-    std::string get_selfpath();
-    const char* pathToPage(const char * frontpage);
+    const char *pathToPage(const char *frontpage);
 
     // in place, truncating trim (" abc d " -> "abc")
     void string_trunc_trim(std::string &in);

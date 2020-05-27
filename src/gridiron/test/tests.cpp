@@ -10,41 +10,40 @@
 
 namespace {
 
-class Test : public oatpp::test::UnitTest {
-public:
-  Test() : oatpp::test::UnitTest("MyTag")
-  {}
+    class Test : public oatpp::test::UnitTest {
+    public:
+        Test() : oatpp::test::UnitTest("MyTag") {}
 
-  void onRun() override {
-    // TODO write correct  tests
-  }
-};
+        void onRun() override {
+            // TODO write correct  tests
+        }
+    };
 
-void runTests() {
+    void runTests() {
 
-  OATPP_LOGD("test", "insert oatpp-swagger tests here");
+        OATPP_LOGD("test", "insert oatpp-swagger tests here");
 
-  OATPP_RUN_TEST(Test);
+        OATPP_RUN_TEST(Test);
 
-}
+    }
 
 }
 
 int main() {
 
-  oatpp::base::Environment::init();
+    oatpp::base::Environment::init();
 
-  runTests();
+    runTests();
 
-  /* Print how much objects were created during app running, and what have left-probably leaked */
-  /* Disable object counting for release builds using '-D OATPP_DISABLE_ENV_OBJECT_COUNTERS' flag for better performance */
-  std::cout << "\nEnvironment:\n";
-  std::cout << "objectsCount = " << oatpp::base::Environment::getObjectsCount() << "\n";
-  std::cout << "objectsCreated = " << oatpp::base::Environment::getObjectsCreated() << "\n\n";
+    /* Print how much objects were created during app running, and what have left-probably leaked */
+    /* Disable object counting for release builds using '-D OATPP_DISABLE_ENV_OBJECT_COUNTERS' flag for better performance */
+    std::cout << "\nEnvironment:\n";
+    std::cout << "objectsCount = " << oatpp::base::Environment::getObjectsCount() << "\n";
+    std::cout << "objectsCreated = " << oatpp::base::Environment::getObjectsCreated() << "\n\n";
 
-  OATPP_ASSERT(oatpp::base::Environment::getObjectsCount() == 0);
+    OATPP_ASSERT(oatpp::base::Environment::getObjectsCount() == 0);
 
-  oatpp::base::Environment::destroy();
+    oatpp::base::Environment::destroy();
 
-  return 0;
+    return 0;
 }

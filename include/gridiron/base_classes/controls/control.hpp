@@ -52,7 +52,8 @@ namespace GridIron {
         GetRoot();                                    // return pointer to the parent control object, regardless of type.
         Control *Find(std::string const &id);                    // find by id, starting with the current instance
         bool Is(std::string type);                            // return whether the classes type name matches
-        virtual std::string render() = 0;                        // render the html for this and all contained children (pure virtual abstract)
+        virtual std::string
+        render() = 0;                        // render the html for this and all contained children (pure virtual abstract)
         void SetHTMLNode(htmlnode *node);
 
         inline bool HTMLNodeRegistered() { return (this->_html_node != NULL); };
