@@ -35,6 +35,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <fstream>
 
 namespace GridIron {
     class Page;
@@ -54,7 +55,7 @@ namespace GridIron {
         ~Page();
 
         virtual void parse();                                                // parse the underlying html
-        virtual oatpp::String render();                                        // recursively render all children and output
+        virtual void render(std::ofstream &stream);                                        // recursively render all children and output
         bool
         RegisterVariable(const std::string name, std::string *data);    // register a variable for front-page access
         inline std::string *
@@ -72,7 +73,7 @@ namespace GridIron {
         static const std::string _namespace;        // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
     private:
         void renderNode(tree<htmlnode>::sibling_iterator *thisnode, int level,
-                        oatpp::String &rendered);    // helper function for recursing the node tree
+                        std::ofstream &stream);    // helper function for recursing the node tree
     };
 }
 

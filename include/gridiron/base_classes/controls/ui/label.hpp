@@ -29,6 +29,7 @@
 
 #include <gridiron/base_classes/controls/control.hpp>
 #include <string>
+#include <fstream>
 
 namespace GridIron {
     class Control;
@@ -47,7 +48,7 @@ namespace GridIron {
 
             virtual void parse();
 
-            virtual oatpp::String render();
+            virtual void render(std::ofstream &stream);
 
             inline void SetText(std::string value) {
                 _text = value;

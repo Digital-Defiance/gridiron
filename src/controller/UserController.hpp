@@ -29,6 +29,7 @@
 // standard
 #include <iostream>
 #include <string>
+#include <fstream>
 // htmlcxx
 
 /**
@@ -79,7 +80,8 @@ public:
 
     lblTest.SetText("these contents were replaced");
 
-    auto response = createResponse(Status::CODE_200, page.render());
+    //page.render(stream)
+    auto response = createResponse(Status::CODE_200, "");
     response->putHeader(Header::CONTENT_TYPE, "text/html");
     return response;
   }

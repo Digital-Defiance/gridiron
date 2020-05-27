@@ -253,7 +253,7 @@ Page::parse() {
 // helper class to output recursively render all tags we're in control of and output the stuff in the template inbetween
 // called by render
 void
-Page::renderNode(tree<htmlnode>::sibling_iterator *thisnode, int level, oatpp::String &rendered) {
+Page::renderNode(tree<htmlnode>::sibling_iterator *thisnode, int level, std::ofstream &stream) {
     tree<htmlnode>::sibling_iterator sib = thisnode->begin();
     while (sib != thisnode->end()) {
         htmlnode *tmpnode = &(sib.node->data);
@@ -264,17 +264,17 @@ Page::renderNode(tree<htmlnode>::sibling_iterator *thisnode, int level, oatpp::S
 
             // if we found the control associated with this node, tell it to render
             // otherwise, print an error in its place
-            if (tmpcontrol != NULL) rendered = oatpp::String(rendered->std_str().append(tmpcontrol->render()->std_str()).c_str());
-            else rendered = oatpp::String(rendered->std_str().append("<!-- ERROR rendering control: no instance found -->").c_str());
+            if (tmpcontrol != NULL) tmpcontrol->render(stream);
+            else stream << "<!-- ERROR rendering control: no instance found -->";
 
 
         } else {
             // otherwise, stick in the html
-            rendered = oatpp::String(rendered->std_str().append(sib->text()).c_str());
+            stream << sib->text();
             // any children of this node
-            if (sib->isTag()) renderNode(&sib, level + 1, rendered);
+            if (sib->isTag()) renderNode(&sib, level + 1, stream);
             // and the stuff after
-            rendered = oatpp::String(rendered->std_str().append(sib->closingText()).c_str());
+            stream << sib->closingText();
         }
 
         ++sib; // next!
@@ -282,10 +282,8 @@ Page::renderNode(tree<htmlnode>::sibling_iterator *thisnode, int level, oatpp::S
 }
 
 // NOTE: if a custom control can have children, it's up to that control to implement the recursive rendering
-oatpp::String
-Page::render() {
-    oatpp::String rendered;            // buffer for the rendered page
-
+void
+Page::render(std::ofstream &stream) {
     int lastpos = 0, startpos = 0, endpos = -1, testpos = -1, i = 0;
     bool replace = false;
     std::string *datacontents;
@@ -296,7 +294,7 @@ Page::render() {
 
     // assemble page: start by rendering the first node.
     tree<htmlnode>::sibling_iterator sib = _tree.begin();
-    renderNode(&sib, 1, rendered);
+    renderNode(&sib, 1, stream);
 
 
     // handle variable Tag replacement- this happens in render so that if the client updated any control values
