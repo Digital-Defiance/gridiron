@@ -47,7 +47,7 @@ namespace GridIron {
 
             virtual void parse();
 
-            virtual std::string render();
+            virtual oatpp::String render();
 
             inline void SetText(std::string value) {
                 _text = value;
@@ -80,7 +80,7 @@ namespace GridIron {
             // TODO: expand to handle most/all properties and deal with the overlap
             // between the properties and parsing the style argument.
             // e.g. setting height should add a style="height: Npx;"
-            // but the template tag may have a style="height: 14px;" - in which case, we have a conflict
+            // but the template Tag may have a style="height: 14px;" - in which case, we have a conflict
             // the label should get the template values at instantiation, and allow to be changed before render
         };
     }

@@ -21,6 +21,7 @@
 // standard
 #include <vector>
 #include <string>
+#include <fstream>
 
 // htmlcxx
 #include <htmlcxx/html/ParserDom.h>
@@ -48,6 +49,8 @@ namespace GridIron {
 
     // parse/find control type in <gridiron::XType ...>
     std::string gridiron_get_type(std::string &tag);
+
+    void streamXmlEncode(std::string& data, std::ofstream &stream);
 }
 
 #endif

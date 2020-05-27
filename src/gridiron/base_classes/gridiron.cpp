@@ -42,7 +42,7 @@ namespace GridIron {
         }
     }
 
-    // parse control type out of tag
+    // parse control type out of Tag
     std::string gridiron_get_type(std::string &tag) {
         // assemble namespace string from config.h constant
         std::string nstr = std::string("<") + std::string(GRIDIRON_XHTML_NS) + std::string("::");
@@ -58,4 +58,34 @@ namespace GridIron {
 
         return tag.substr(nstr.length(), (firstspace - nstr.length()));
     }
+
+    void streamXmlEncode(const char *data, std::ofstream &stream) {
+        if (data != nullptr) {
+            for(size_t pos = 0; ; ++pos) {
+                switch(data[pos]) {
+                    case '\0':
+                        return;
+                    case '&':
+                        stream << "&amp;";
+                        break;
+                    case '\"':
+                        stream << "&quot;";
+                        break;
+                    case '\'':
+                        stream << "&apos;";
+                        break;
+                    case '<':
+                        stream << "&lt;";
+                        break;
+                    case '>':
+                        stream << "&gt;";
+                        break;
+                    default:
+                        stream << data[pos];
+                        break;
+                }
+            }
+        }
+    }
+
 }

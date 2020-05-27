@@ -52,7 +52,7 @@ void
 Label::parse() {
     Page *_Page = GetPage();
     if (_Page == NULL) throw GridException(300, "Control must be attached to a page");
-    if (_html_node == NULL) throw GridException(301, "HTML tag not found for this instance");
+    if (_html_node == NULL) throw GridException(301, "HTML Tag not found for this instance");
 
     // if there are child nodes, that will be the text for the label, should not override any text that has already been set.
     // if _defaulttext == true, can override
@@ -69,16 +69,20 @@ Label::parse() {
                              _html_node->length() - endtag.length() - starttag.length());
     }
 
-    // if we're an autonomous tag, automatically register the text string for access
+    // if we're an autonomous Tag, automatically register the text string for access
     // otherwise client will have to manually register if they want it accessible
     if (_autonomous) _Page->RegisterVariable(_id + ".Text", &_text);
 }
 
-std::string
+oatpp::String
 Label::render() {
     this->Label::parse();
-
-    return "<div style=\"align: left;\">" + _text + "</div>";
+    htmlcxx::HTML::Node n;
+    n.tagName("div");
+    n.attributes()
+    n.
+    const char* foo = "<div style=\"align: left;\">" + _text.c_str() + "</div>";
+    return oatpp::String(foo);
 }
 
 ////////////////////////////////////////////////////////////

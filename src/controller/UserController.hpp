@@ -79,7 +79,7 @@ public:
 
     lblTest.SetText("these contents were replaced");
 
-    auto response = createResponse(Status::CODE_200, page.render().c_str());
+    auto response = createResponse(Status::CODE_200, page.render());
     response->putHeader(Header::CONTENT_TYPE, "text/html");
     return response;
   }

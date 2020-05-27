@@ -1,5 +1,5 @@
 # src/gridiron/base_classes/CmakeLists.txt
-add_library(gridiron SHARED "")
+add_library(gridiron SHARED "" tag.cpp tag.hpp)
 set_target_properties(gridiron PROPERTIES VERSION ${PROJECT_VERSION})
 target_sources(gridiron
         PUBLIC

@@ -152,16 +152,16 @@ Page::parse() {
         // tags we're interested in are <gridiron::* id="foo"></gridiron::*>
         // a quirk of htmlcxx is helpful to us, tagName only has up to the ::'s
 
-        // if the current element is a tag (not a comment, etc)
+        // if the current element is a Tag (not a comment, etc)
         // and it's one we're supposed to interpret:
         if (it->isTag() && (it->tagName() == Page::_namespace)) {
-            // get the full tag string
+            // get the full Tag string
             std::string tagData = it->text();
             // parse out the "MyType" in gridiron::MyType or gi::MyType (based on XHTML NS
             std::string tagType = gridiron_get_type(tagData);
 
             if (tagType.empty()) {
-                std::cerr << "ERROR: Control tag is missing control type" << std::endl;
+                std::cerr << "ERROR: Control Tag is missing control type" << std::endl;
             } else {
                 // use the htmlcxx parsing routine to get all of the attributes and values
                 it->parseAttributes();
@@ -170,38 +170,38 @@ Page::parse() {
                 // the second has the actual id, if present
                 std::pair<bool, std::string> idresult = it->attribute("id");
                 if (!idresult.first) {
-                    std::cerr << "ERROR: Control tag is missing id" << std::endl;
+                    std::cerr << "ERROR: Control Tag is missing id" << std::endl;
                 } else {
-                    // same story here, bool will be true if tag contained auto
+                    // same story here, bool will be true if Tag contained auto
                     std::pair<bool, std::string> autoresult = it->attribute("auto");
                     bool isauto = (autoresult.first && (autoresult.second == "true"));
 
                     // look for any controls on the page with specified ID
                     Control *instance = Find(idresult.second);
 
-                    // if we found an auto tag and it's the first pass, and the id was already registered (earlier in the while loop, by another tag)
+                    // if we found an auto Tag and it's the first pass, and the id was already registered (earlier in the while loop, by another Tag)
                     if ((instance != NULL) && isauto && firstpass) {
-                        std::cerr << "found auto tag (" << tagData
+                        std::cerr << "found auto Tag (" << tagData
                                   << ") and the specified ID was already in use by a control of type "
                                   << instance->Type() << std::endl;
 
-                        // if we found a standard tag, the id was registered (as it should be, by the client code) and it's not the first pass
+                        // if we found a standard Tag, the id was registered (as it should be, by the client code) and it's not the first pass
                     } else if ((instance != NULL) && !isauto && !firstpass) {
-                        std::cerr << "found tag (" << tagData << ") and instance with type " << instance->Type()
+                        std::cerr << "found Tag (" << tagData << ") and instance with type " << instance->Type()
                                   << ", id=" << idresult.second << std::endl;
 
-                        // make sure the instance with that ID is the same type as the control tag
+                        // make sure the instance with that ID is the same type as the control Tag
                         if (!(instance->Is(tagType))) {
                             std::cerr << "ERROR: instance with that id is not a " << tagType << std::endl;
 
                         } else {
-                            // if it's the right type and id, but it already has an html node associated, we've already seen this tag in the file- duplicate
+                            // if it's the right type and id, but it already has an html node associated, we've already seen this Tag in the file- duplicate
                             if (instance->HTMLNodeRegistered()) {
-                                std::cerr << "Control instance already bound to another tag." << std::endl;
+                                std::cerr << "Control instance already bound to another Tag." << std::endl;
 
-                                // otherwise, we've found the instance that's supposed to match this tag
+                                // otherwise, we've found the instance that's supposed to match this Tag
                             } else {
-                                std::cerr << "Control tag and instance match up." << std::endl;
+                                std::cerr << "Control Tag and instance match up." << std::endl;
                                 // set the associated node pointer
                                 instance->SetHTMLNode(&(*it));
                                 // add to nodemap
@@ -211,11 +211,11 @@ Page::parse() {
                             }
                         }
 
-                        // if we found an auto tag on the first pass and no one is using the specified id (at this point instance is guaranteed == NULL, given the other two)
+                        // if we found an auto Tag on the first pass and no one is using the specified id (at this point instance is guaranteed == NULL, given the other two)
                         // we've previously handled (instance != NULL, auto, firstpass) and (instance != NULL, !auto, !firstpass)
-                        // if auto and firstpass, instance has to be NULL- meaning the tag's requested id is available
+                        // if auto and firstpass, instance has to be NULL- meaning the Tag's requested id is available
                     } else if (isauto && firstpass) {
-                        std::cerr << "found auto tag, specified ID is available" << std::endl;
+                        std::cerr << "found auto Tag, specified ID is available" << std::endl;
 
                         // try to create a control of this type. The control class must be registered with the factory.
                         // only classes that support autos should register.
@@ -227,7 +227,7 @@ Page::parse() {
                             std::cerr << "unable to create autonomous control of type " << tagType << std::endl;
 
                         } else {
-                            std::cerr << "autonomous tag of type=" << tagType << ", id=" << idresult.second
+                            std::cerr << "autonomous Tag of type=" << tagType << ", id=" << idresult.second
                                       << " was created." << std::endl;
                             // set the associated node pointer
                             instance->SetHTMLNode(&(*it));
@@ -237,9 +237,9 @@ Page::parse() {
                             controlcount++;
                         }
 
-                        // if still auto tag, by elimination, this isn't the first pass- we're not interested. No error here.
+                        // if still auto Tag, by elimination, this isn't the first pass- we're not interested. No error here.
                     } else if (isauto) {
-                        std::cerr << "found auto tag, skipping for second pass" << std::endl;
+                        std::cerr << "found auto Tag, skipping for second pass" << std::endl;
 
                     }
                 }
@@ -253,7 +253,7 @@ Page::parse() {
 // helper class to output recursively render all tags we're in control of and output the stuff in the template inbetween
 // called by render
 void
-Page::renderNode(tree<htmlnode>::sibling_iterator *thisnode, int level, std::string &rendered) {
+Page::renderNode(tree<htmlnode>::sibling_iterator *thisnode, int level, oatpp::String &rendered) {
     tree<htmlnode>::sibling_iterator sib = thisnode->begin();
     while (sib != thisnode->end()) {
         htmlnode *tmpnode = &(sib.node->data);
@@ -264,16 +264,17 @@ Page::renderNode(tree<htmlnode>::sibling_iterator *thisnode, int level, std::str
 
             // if we found the control associated with this node, tell it to render
             // otherwise, print an error in its place
-            if (tmpcontrol != NULL) rendered.append(tmpcontrol->render());
-            else rendered.append("<!-- ERROR rendering control: no instance found -->");
+            if (tmpcontrol != NULL) rendered = oatpp::String(rendered->std_str().append(tmpcontrol->render()->std_str()).c_str());
+            else rendered = oatpp::String(rendered->std_str().append("<!-- ERROR rendering control: no instance found -->").c_str());
+
 
         } else {
             // otherwise, stick in the html
-            rendered.append(sib->text());
+            rendered = oatpp::String(rendered->std_str().append(sib->text()).c_str());
             // any children of this node
             if (sib->isTag()) renderNode(&sib, level + 1, rendered);
             // and the stuff after
-            rendered.append(sib->closingText());
+            rendered = oatpp::String(rendered->std_str().append(sib->closingText()).c_str());
         }
 
         ++sib; // next!
@@ -281,9 +282,9 @@ Page::renderNode(tree<htmlnode>::sibling_iterator *thisnode, int level, std::str
 }
 
 // NOTE: if a custom control can have children, it's up to that control to implement the recursive rendering
-std::string
+oatpp::String
 Page::render() {
-    std::string rendered;            // buffer for the rendered page
+    oatpp::String rendered;            // buffer for the rendered page
 
     int lastpos = 0, startpos = 0, endpos = -1, testpos = -1, i = 0;
     bool replace = false;
@@ -298,14 +299,14 @@ Page::render() {
     renderNode(&sib, 1, rendered);
 
 
-    // handle variable tag replacement- this happens in render so that if the client updated any control values
+    // handle variable Tag replacement- this happens in render so that if the client updated any control values
     // we get them into the output instead of the defaults from instantiation
     while (true) {
         startpos = rendered.find("<%=", startpos);
         if (startpos == std::string::npos) break;    // no tags found, abort
 
         endpos = rendered.find("%>", startpos);
-        if (endpos == std::string::npos) break;    // no end tag to be found, abort
+        if (endpos == std::string::npos) break;    // no end Tag to be found, abort
 
         // have a <%=varname%> from startpos up to (but not including) endpos
         std::string vartag = std::string(rendered.begin() + startpos + 3, rendered.begin() + endpos);
@@ -318,7 +319,7 @@ Page::render() {
         // if tags are broken
         if (vartag.find(' ') != std::string::npos) {
             startpos++;    // increment startpos so we don't find the same one
-            continue;        // skip that tag
+            continue;        // skip that Tag
         }
 #endif
 
@@ -333,10 +334,10 @@ Page::render() {
 
         // do the actual replace if necessary
         if (replace) {
-            // delete tag from original data, since it's being replaced
+            // delete Tag from original data, since it's being replaced
             rendered.erase(rendered.begin() + startpos, rendered.begin() + endpos + 2);
 
-            // copy the requested variable contents to where we deleted the variable tag
+            // copy the requested variable contents to where we deleted the variable Tag
             rendered.insert(startpos, *datacontents);
         } else {
             startpos++;  // variable wasn't registered, move ahead one so we don't keep hitting it
@@ -345,7 +346,7 @@ Page::render() {
         lastpos = endpos + 2;
     }
 
-    return rendered;
+    return oatpp::String(rendered.c_str());
 }
 
 // for controls to make variables available for HTML replacement. alphanumeric and _ only.

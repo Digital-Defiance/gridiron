@@ -44,7 +44,7 @@ namespace GridIron {
         _autonomous = false;
         // this is to make the class type accessible from the base class
         _classtype = Control::ClassType();
-        // this is a pointer to the html tag associated with this instance
+        // this is a pointer to the html Tag associated with this instance
         _html_node = NULL;
 
         // we must have an ID- and only one instance of an id may exist on all controls under a page object

@@ -27,7 +27,7 @@ Variable Tags
 
 These tags will be directly replaced with the string contained in the
 variable referenced at render time. Variable names are alphanumeric and
-underscore only. The tag may not contain spaces unless you configure with
+underscore only. The Tag may not contain spaces unless you configure with
 --enable-vartag-spaces. The advantage in not allowing spaces prevents having
 to trim spaces off and results in a perhaps negligably faster, but simpler parsing.
 In a large page, this may add up.
@@ -48,20 +48,20 @@ ID, except in the case of autonomous tags, described shortly.
 
 Autonomous Tags (also see AutonomousTags.txt)
 ----------------------------
-One term you'll see used a fair bit is an autonomous tag or control. This is a
-tag in the font page that automatically instantiates a control of the
+One term you'll see used a fair bit is an autonomous Tag or control. This is a
+Tag in the font page that automatically instantiates a control of the
 corresponding type, without (must not have) an existing C++ instance.
 
 Not all control types will support autonomous tags as it may not be logical.
 
 They're the same as Control Tags, with the exception that they'll
 automatically create the control instance if the type is registered, and
-automatically register some variables for replacement tag and C++ access.
+automatically register some variables for replacement Tag and C++ access.
 
-An autonomous tag uses the same syntax as a Control Tag, but adds the
+An autonomous Tag uses the same syntax as a Control Tag, but adds the
 attribute auto="true" (setting auto="false" has no effect).
 
-For example, in the case of an autonomous label tag, it will register id_Text
+For example, in the case of an autonomous label Tag, it will register id_Text
 for access.
 <gridiron::Label id="lblAuto1234" auto="true">default text</gridiron::Label>
 <br><%=lblAuto1234%>
@@ -105,12 +105,12 @@ Control::parse().
 
 Calling PageInstance.render() first calls Page::parse() again, which goes back
 through and this time pays attention to Standard Control Tags and pulls in the
-attributes from the template tag if they haven't already been set by the
+attributes from the template Tag if they haven't already been set by the
 control's methods. After the second and final parse run, every control on the
 page will have it's render method called (most controls will call
 Control::parse() from Control::render() to pull in defaults, but this is not
 automatic if you're making a control) and the output will replace the original
-control tag upon output. At the very end of Page::render(), the variable tag
+control Tag upon output. At the very end of Page::render(), the variable Tag
 replacement occurs, just before outputting to std::out.
 
 
