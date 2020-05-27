@@ -12,10 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: "Create build directory"
-      run: mkdir cmake-build-debug
-    - name: "Change to build directory"
-      run: cd cmake-build-debug
-    - name: cmake
-      run: cmake ..
+    - name: checkout
+      uses: actions/checkout@v2
+    - name: prerequisites
+      run: sudo apt-get install libboost-all-dev libhtmlcxx-dev
+    - name: run-cmake
+      uses: lukka/run-cmake@v2.5
