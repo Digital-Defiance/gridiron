@@ -1,12 +1,13 @@
 # GridIron
 
-C++ Codebehind framework, modeled after ASP.NET, based on Oat++
+C++ "Code-Beside" framework, modeled after ASP.NET, based on Oat++
 
 See more:
 
+- [GridIron Wiki](https://github.com/ProjectGridIron/GridIron/wiki)
 - [Oat++ Website](https://oatpp.io/)
 - [Oat++ Github Repository](https://github.com/oatpp/oatpp)
-- [Get Started](https://oatpp.io/docs/start)
+- [Oat++ Getting Started Guide](https://oatpp.io/docs/start)
 
 ## Overview
 
