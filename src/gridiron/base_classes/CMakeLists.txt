@@ -7,7 +7,7 @@ target_sources(gridiron
         ${CMAKE_SOURCE_DIR}/include/gridiron/base_classes/exceptions.hpp
         gridiron.cpp ${CMAKE_SOURCE_DIR}/include/gridiron/base_classes/gridiron.hpp
         page.cpp ${CMAKE_SOURCE_DIR}/include/gridiron/base_classes/page.hpp
-        tag.cpp ${CMAKE_SOURCE_DIR}/include/gridiron/base_classes/tag.hpp
+        ${CMAKE_SOURCE_DIR}/include/gridiron/base_classes/tag.hpp
 )
 target_link_libraries(gridiron ${HTMLCXX_LIBRARIES})
 add_subdirectory(controls)
