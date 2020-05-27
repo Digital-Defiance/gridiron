@@ -57,7 +57,7 @@ script to install required oatpp modules.
 $ mkdir build && cd build
 $ cmake ..
 $ make 
-$ ./crud-exe        # - run application.
+$ ./gridiron-demo        # - run application.
 ```
 
 #### In Docker
@@ -72,7 +72,7 @@ $ docker run -p 8000:8000 -t example-crud
 ### Example endpoint boilerplate (*the render mechanism is about to change)
 ```
   ENDPOINT("GET", "/", root) {
-    GridIron::Page page("crud-exe/testapp.html");
+    GridIron::Page page("gridiron-demo/testapp.html");
     GridIron::controls::Label lblTest("lblTest", &page);
     page.RegisterVariable("lblTest_Text", lblTest.GetTextPtr());
     lblTest.SetText("these contents were replaced");
@@ -99,24 +99,12 @@ $ docker run -p 8000:8000 -t example-crud
         <th align="left" bgcolor="#dedede" colspan="2">Variable Replacement:</th>
     </tr>
     <tr>
-        <td align="left"><b>Front Page (no spaces):</b></td>
-        <td align="left"><%=__frontpage%></td>
+        <td align="left"><b>Front Page:</b></td>
+        <td align="left"><gi::Value key="gridiron.frontPage" /></td>
     </tr>
     <tr>
-        <td align="left"><b>Front Page File (no spaces):</b></td>
-        <td align="left"><%=__frontpage_file%></td>
-    </tr>
-    <tr>
-        <th align="left" bgcolor="#dedede" colspan="2">Variable Replacement:<br>
-            <small>This will not render unless you configured with --enable-vartag-spaces</small></th>
-    </tr>
-    <tr>
-        <td align="left"><b>Front Page (with spaces):</b></td>
-        <td align="left"><%= __frontpage %></td>
-    </tr>
-    <tr>
-        <td align="left"><b>Front Page File (no spaces):</b></td>
-        <td align="left"><%= __frontpage_file %></td>
+        <td align="left"><b>Front Page File:</b></td>
+        <td align="left"><gi::Value key="gridiron.frontPageFile /></td>
     </tr>
     <tr>
         <th align="left" bgcolor="#dedede" colspan="2">gi::Label Test<br>
@@ -132,7 +120,7 @@ $ docker run -p 8000:8000 -t example-crud
     </tr>
     <tr>
         <td align="left"><b>lblTest.Text:</b></td>
-        <td align="left"><%=lblTest_Text%></td>
+        <td align="left"><gi::Value key="lblTest.Text" /></td>
     </tr>
     <tr>
         <th align="left" bgcolor="#dedede" colspan="2">Autonomous gi::Label Test<br>
@@ -148,7 +136,7 @@ $ docker run -p 8000:8000 -t example-crud
     </tr>
     <tr>
         <td align="left"><b>lblAutoTest.Text:</b></td>
-        <td align="left"><%=lblAutoTest.Text%></td>
+        <td align="left"><gi::Value key="lblAutoTest.Text" /></td>
     </tr>
 </table>
 <a href="swagger/ui">Checkout Swagger-UI page</a>
@@ -156,4 +144,4 @@ $ docker run -p 8000:8000 -t example-crud
 </html>
 ```
 ### Sample output/test-page
-![](https://raw.githubusercontent.com/ProjectGridIron/GridIron/master/github-assets/crud-exe.png)
+![](https://raw.githubusercontent.com/ProjectGridIron/GridIron/master/github-assets/gridiron-demo.png)

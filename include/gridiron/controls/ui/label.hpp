@@ -11,8 +11,6 @@
  *
  * The following libraries are only linked in, and no code is based directly from them:
  * htmlcxx is under the Apache 2.0 License
- * CGICC is under GPLv3
- * Boost is under the Boost license
  ***************************************************************************************
  * gridiron::Label custom control class
  * ------------------------------------
@@ -27,7 +25,7 @@
  * much work needs to be done in populating this
  */
 
-#include <gridiron/base_classes/controls/control.hpp>
+#include <gridiron/controls/control.hpp>
 #include <string>
 #include <fstream>
 
@@ -40,15 +38,13 @@ namespace GridIron {
 
         class Label : public Control {
         public:
-            Label(const char *id, Control *parent);
+            Label(const char *id, unique_control_ptr parent);
 
-            Label(const char *id, Control *parent, const char *text);
+            Label(const char *id, unique_control_ptr parent, const char *text);
 
             ~Label();
 
             virtual void parse();
-
-            virtual void render(std::ofstream &stream);
 
             inline void SetText(std::string value) {
                 _text = value;
@@ -68,8 +64,7 @@ namespace GridIron {
 
             inline static const bool AllowAutonomous() { return true; }
 
-            inline static const char *ClassType() { return "Label"; }        // set our type
-
+            friend std::ostream &operator<<(std::ostream &os, Label &label);
 
         private:
             bool _defaulttext;

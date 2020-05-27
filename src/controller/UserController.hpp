@@ -11,7 +11,6 @@
    *
    * The following libraries are only linked in, and no code is based directly from them:
    * htmlcxx is under the Apache 2.0 License
-   * Boost is under the Boost license
    ***************************************************************************************/
 
 #ifndef UserController_hpp
@@ -24,8 +23,8 @@
 #include "oatpp/core/macro/codegen.hpp"
 #include "oatpp/core/macro/component.hpp"
 
-#include <gridiron/base_classes/page.hpp>
-#include <gridiron/base_classes/controls/ui/label.hpp>
+#include <gridiron/controls/page.hpp>
+#include <gridiron/controls/ui/label.hpp>
 // standard
 #include <iostream>
 #include <string>
@@ -74,9 +73,9 @@ public:
   }
   ENDPOINT("GET", "/", root) {
 
-    GridIron::Page page("crud-exe/testapp.html");
-    GridIron::controls::Label lblTest("lblTest", &page);
-    page.RegisterVariable("lblTest_Text", lblTest.GetTextPtr());
+    GridIron::Page page("gridiron-demo/testapp.html");
+    GridIron::controls::Label lblTest("lblTest", page.This());
+    page.RegisterVariable("lblTest.Text", lblTest.GetTextPtr());
 
     lblTest.SetText("these contents were replaced");
 

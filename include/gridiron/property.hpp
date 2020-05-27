@@ -11,8 +11,6 @@
  *
  * The following libraries are only linked in, and no code is based directly from them:
  * htmlcxx is under the Apache 2.0 License
- * CGICC is under GPLv3
- * Boost is under the Boost license
  ***************************************************************************************/
 
 #ifndef GRIDIRON_PROPERTY_H

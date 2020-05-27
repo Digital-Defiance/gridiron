@@ -11,8 +11,6 @@
  *
  * The following libraries are only linked in, and no code is based directly from them:
  * htmlcxx is under the Apache 2.0 License
- * CGICC is under GPLv3
- * Boost is under the Boost license
  ***************************************************************************************
  * Base Control Class
  * ------------------
@@ -25,109 +23,139 @@
 
 #include <gridiron/base_classes/page.hpp>
 #include <gridiron/base_classes/controls/control.hpp>
-#include <iostream>
 
 namespace GridIron {
 
-    Control::Control(const char *id, Control *parent) {
-        Control *result = NULL;
-        Page *_Page;
+    Control::Control(const char *id, unique_control_ptr parent) {
+        unique_control_ptr result = nullptr;
+        unique_page_ptr _Page;
 
         // INITIALIZE VARIABLES
         // our id
         _id = std::string(id);
         // our parent, as given
-        _parent = parent;
+        _parent.swap(parent);
         // whether this page should be serialized into the viewstate
-        _enableviewstate = false;
+        _viewStateEnabled = false;
         // whether this is an autonomous control - affects behavior in derived classes
         _autonomous = false;
-        // this is to make the class type accessible from the base class
-        _classtype = Control::ClassType();
         // this is a pointer to the html Tag associated with this instance
-        _html_node = NULL;
+        _htmlNode = nullptr;
+        _controlTagName = "Control";
+        _renderTagName = "div"; // default to div
 
         // we must have an ID- and only one instance of an id may exist on all controls under a page object
         if (_id.length() == 0) throw GridException(200, "no id specified");
 
         // find the page control if we have one, then look to see if the id is already registered
         _Page = GetPage();
-        if (_Page != NULL) {
+        if (_Page != nullptr) {
             // check page for existing controls with that id
-            result = _Page->Find(id);
-            if (result != NULL) throw GridException(201, "id already in use");
+            result = _Page->FindByID(_id, true);
+            if (result != nullptr) throw GridException(201, "id already in use");
 
             // register ourselves with the parent if we have one (pages dont)
             // parent will have a pointer to our id string to save mem and allow for changes
-            if (_parent != NULL) _parent->register_child(&_id, this);
+            if (_parent != nullptr) _parent->registerChild(_id, this);
         }
+    }
+
+    std::ostream& operator<<(std::ostream& os, const Control& control) {
+        os << control._htmlNode;
+        return os;
+    }
+
+    unique_control_ptr Control::This() {
+        return std::unique_ptr<Control>(this);
     }
 
     // find the bottom-most control, regardless of type
     // returns: pointer - may be self
-    Control *
+    unique_control_ptr
     Control::GetRoot(void) {
-        Control *ptr = this;
+        unique_control_ptr ptr = This();
 
-        while (ptr->_parent != NULL) {
-            ptr = ptr->_parent;
+        while (ptr->_parent != nullptr) {
+            return _parent->This();
         }
-        return (Page *) ptr;
+
+        return ptr;
     }
 
     // fine the bottom-most control, only if a Page object
-    // returns: pointer on success or NULL, may be self
-    Page *
+    // returns: pointer on success or nullptr, may be self
+    unique_page_ptr
     Control::GetPage(void) {
-        Control *ptr = GetRoot();
-        if (strcmp(ptr->Type(), "Page") != 0) return NULL;
-        else return (Page *) ptr;
+        unique_control_ptr ptr = GetRoot();
+        Control *p = ptr.get();
+        if (!Page::instanceOf<Page>(p)) return nullptr;
+        else return ((Page *) p)->This();
+    }
+
+    unique_control_ptr
+    Control::Find(Control& control) {
+        // check map
+        std::map<Control*, unique_control_ptr>::iterator it = _controlsByControl.find(&control);
+        if (it != _controlsByControl.end()) {
+            return it->first->This();
+        }
+        // not found, create a shared pointer
+        unique_control_ptr spC = unique_control_ptr (&control);
+        // add to map
+        std::pair<std::map<Control*, unique_control_ptr>::iterator,bool> inserted = _controlsByControl.insert(std::make_pair(&control,std::move(spC)));
+        // return the unique pointer
+        return inserted.first->first->This();
     }
 
     // recursive search through all controls under this object, return the one with specified id
-    Control *
-    Control::Find(std::string const &id) {
-        Control *ptr = NULL;
+    unique_control_ptr
+    Control::FindByID(const std::string id, bool searchParentsIfNotChild) {
 
-        if (_children.size() == 0) return NULL;
-
-        // search child map recursively
-        for (child_map::iterator i = _children.begin(), iend = _children.end(); i != iend; ++i) {
-            // check the child's id first
-            if (*(i->first) == id) {
-                return (i->second);
+        // prioritize children first. if the end user wants to be efficient for a tree-wide search, start at root
+        if (_children.size() > 0) {
+            // search immediate children first
+            for (vector_control_children::iterator it = _children.begin(); it != _children.end(); ++it) {
+                // check the child's id first
+                if ((**it).ID() == id) {
+                    return (std::static_pointer_cast<unique_control_ptr>(*it));
+                }
             }
-            // check its children, if any
-            if ((i->second)->_children.size() > 0) {
-                if (i->second == this) continue;    // avoid infinite loops
-                ptr = (i->second)->Find(id);
-                if (ptr != NULL) return ptr;
+        }
+
+        if (searchParentsIfNotChild) {
+            control_map::iterator it = _controlsByID.find(id);
+            if (it != _controlsByID.end()) {
+                return it->second;
             }
         }
 
         // no luck
-        return NULL;
+        return nullptr;
     }
 
-    // return whether this control is of 'type', mostly a timesaver
-    bool
-    Control::Is(std::string type) {
-        return (strcmp(this->Type(), type.c_str()) == 0);
+    std::ostream &Control::fullName(std::ostream &os) {
+        os << this->getNamespace() << "::" << this->_controlTagName;
+        return os;
+    }
+
+    std::string Control::fullName() {
+        return (this->getNamespace() + "::" + this->_controlTagName)
     }
 
     // register this control with the parent
     bool
-    Control::register_child(std::string *id, Control *const pointer) {
-        if ((id == NULL) || (pointer == NULL)) return false;
+    Control::registerChild(std::string id, Control *control) {
+        if (id.empty() || (control == nullptr)) return false;
 
         // check for duplicates first
-        for (child_map::iterator i = _children.begin(), iend = _children.end(); i != iend; ++i) {
-            if (*(i->first) == *id) return false;    // id already in list
+        for (vector_control_children ::iterator it = _children.begin(); it != _children.end(); ++it) {
+            if ((*it)->ID() == id) return false;    // id already in list
         }
 
 
         // then add
-        _children[id] = pointer;
+        unique_control_ptr spC = std::make_shared<Control>(control);
+        _children.push_back(new std::shared_ptr<Control>(control));
         std::cerr << "There are now " << _children.size() << " children registered." << std::endl;
 
         return true;
@@ -136,7 +164,7 @@ namespace GridIron {
     // unregister this control from the parent
     bool
     Control::unregister_child(std::string &id) {
-        for (child_map::iterator i = _children.begin(), iend = _children.end(); i != iend; ++i) {
+        for (control_map::iterator i = _children.begin(), iend = _children.end(); i != iend; ++i) {
             if (*(i->first) == id) {
                 _children.erase(i);
                 return true;
@@ -149,13 +177,16 @@ namespace GridIron {
     // destructor
     Control::~Control() {
         // unregister ourselves from the parent if we have one (pages dont)
-        if (_parent != NULL) _parent->unregister_child(_id);
+        if (_parent != nullptr) _parent->unregister_child(_id);
     }
 
     // allow page class to tell us where our data is
     void
     Control::SetHTMLNode(htmlnode *node) {
-        _html_node = node;
+        if ((_htmlNode != nullptr) && (node != nullptr)) {
+            throw GridException(500, "HTMLNode already associated");
+        }
+        _htmlNode = node;
     }
 
     // allow the page class to tell us we're an anonymous instance
@@ -173,51 +204,51 @@ namespace GridIron {
 
     ControlFactory::~ControlFactory() {
         // individual entries need not be deleted
-        delete _controlproxies;
+        delete _controlProxies;
     }
 
     // if the list of proxies is empty, create it
     void
     ControlFactory::Init() {
-        if (!_controlproxies) _controlproxies = new factory_vector;
+        if (!_controlProxies) _controlProxies = new factory_vector;
     }
 
     // the derived control classes' .cpp files instantiate
     // a proxy class, which calls this, effectively adding themselves
     void
     ControlFactory::Register(const ControlFactoryProxyBase *proxy) {
-        if (proxy == NULL) return;
+        if (proxy == nullptr) return;
         Init();
-        _controlproxies->push_back(proxy);
+        _controlProxies->push_back(proxy);
     }
 
     // how many class types are registered
     int
     ControlFactory::GetCount() {
-        if (!_controlproxies) return 0;
-        else return _controlproxies->size();
+        if (!_controlProxies) return 0;
+        else return _controlProxies->size();
     }
 
     // wrapper to get access
     const
     ControlFactoryProxyBase *
     ControlFactory::GetAt(int i) {
-        return _controlproxies->at(i);
+        return _controlProxies->at(i);
     }
 
     // iterates through the control types that have registered, tells the proxy to create us one if its type matches
     Control *
     ControlFactory::CreateByType(const char *type, const char *id, Control *parent) {
         std::cerr << "Requesting creation of type " << type << std::endl;
-        for (int i = 0; i < _controlproxies->size(); ++i) {
-            if (strcmp(_controlproxies->at(i)->GetType(), type) == 0) {
-                return _controlproxies->at(i)->CreateObject(id, parent);
+        for (int i = 0; i < _controlProxies->size(); ++i) {
+            if (strcmp(_controlProxies->at(i)->GetType(), type) == 0) {
+                return _controlProxies->at(i)->CreateObject(id, parent);
             }
         }
-        return NULL;
+        return nullptr;
     }
 
     // global factory instance
-    ControlFactory g_controlfactory;
+    ControlFactory globalControlFactory;
 }
 
