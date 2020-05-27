@@ -69,79 +69,91 @@ $ docker run -p 8000:8000 -t example-crud
 
 ---
 
-### Endpoints declaration
-
-#### Create User
-
-```c++
-ENDPOINT_INFO(createUser) {
-  info->summary = "Create new User";
-  info->addConsumes<Object<UserDto>>("application/json");
-  info->addResponse<Object<UserDto>>(Status::CODE_200, "application/json");
-}
-ENDPOINT("POST", "demo/api/users", createUser,
-         BODY_DTO(Object<UserDto>, userDto)) {
-  return createDtoResponse(Status::CODE_200, m_database->createUser(userDto));
-}
+### Example endpoint boilerplate (*the render mechanism is about to change)
+```
+  ENDPOINT("GET", "/", root) {
+    GridIron::Page page("crud-exe/testapp.html");
+    GridIron::controls::Label lblTest("lblTest", &page);
+    page.RegisterVariable("lblTest_Text", lblTest.GetTextPtr());
+    lblTest.SetText("these contents were replaced");
+    auto response = createResponse(Status::CODE_200, page.render().c_str());
+    response->putHeader(Header::CONTENT_TYPE, "text/html");
+    return response;
+  }
 ```
 
-#### Update User
-
-```c++
-ENDPOINT_INFO(putUser) {
-  info->summary = "Update User by userId";
-  info->addConsumes<Object<UserDto>>("application/json");
-  info->addResponse<Object<UserDto>>(Status::CODE_200, "application/json");
-  info->addResponse<String>(Status::CODE_404, "text/plain");
-}
-ENDPOINT("PUT", "demo/api/users/{userId}", putUser,
-         PATH(Int32, userId),
-         BODY_DTO(Object<UserDto>, userDto)) {
-  userDto->id = userId;
-  return createDtoResponse(Status::CODE_200, m_database->updateUser(userDto));
-}
+### "Code-Beside"
 ```
-
-#### Get one User
-
-```c++
-ENDPOINT_INFO(getUserById) {
-  info->summary = "Get one User by userId";
-  info->addResponse<Object<UserDto>>(Status::CODE_200, "application/json");
-  info->addResponse<String>(Status::CODE_404, "text/plain");
-}
-ENDPOINT("GET", "demo/api/users/{userId}", getUserById,
-         PATH(Int32, userId)) {
-  auto user = m_database->getUserById(userId);
-  OATPP_ASSERT_HTTP(user, Status::CODE_404, "User not found");
-  return createDtoResponse(Status::CODE_200, user);
-}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>GridIron Test Page</title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<h2>GridIron Test Page</h2>
+<hr/>
+<table border="0" cellpadding="5" cellspacing="5">
+    <tr>
+        <th align="left" bgcolor="#dedede" colspan="2">Variable Replacement:</th>
+    </tr>
+    <tr>
+        <td align="left"><b>Front Page (no spaces):</b></td>
+        <td align="left"><%=__frontpage%></td>
+    </tr>
+    <tr>
+        <td align="left"><b>Front Page File (no spaces):</b></td>
+        <td align="left"><%=__frontpage_file%></td>
+    </tr>
+    <tr>
+        <th align="left" bgcolor="#dedede" colspan="2">Variable Replacement:<br>
+            <small>This will not render unless you configured with --enable-vartag-spaces</small></th>
+    </tr>
+    <tr>
+        <td align="left"><b>Front Page (with spaces):</b></td>
+        <td align="left"><%= __frontpage %></td>
+    </tr>
+    <tr>
+        <td align="left"><b>Front Page File (no spaces):</b></td>
+        <td align="left"><%= __frontpage_file %></td>
+    </tr>
+    <tr>
+        <th align="left" bgcolor="#dedede" colspan="2">gi::Label Test<br>
+            <small>This will show "default contents" if SetText did not work</small></th>
+    </tr>
+    <tr>
+        <td align="left" colspan="2">
+            <gi::Label id="lblTest">default contents</gi::Label>
+        </td>
+    </tr>
+    <tr>
+        <th align="left" bgcolor="#dedede" colspan="2">Variable Replacement with text from lblTest:</th>
+    </tr>
+    <tr>
+        <td align="left"><b>lblTest.Text:</b></td>
+        <td align="left"><%=lblTest_Text%></td>
+    </tr>
+    <tr>
+        <th align="left" bgcolor="#dedede" colspan="2">Autonomous gi::Label Test<br>
+            <small>This should show "default auto contents".</small></th>
+    </tr>
+    <tr>
+        <td align="left" colspan="2">
+            <gi::Label auto="true" id="lblAutoTest">default auto contents</gi::Label>
+        </td>
+    </tr>
+    <tr>
+        <th align="left" bgcolor="#dedede" colspan="2">Variable Replacement with text from lblAutoTest:</th>
+    </tr>
+    <tr>
+        <td align="left"><b>lblAutoTest.Text:</b></td>
+        <td align="left"><%=lblAutoTest.Text%></td>
+    </tr>
+</table>
+<a href="swagger/ui">Checkout Swagger-UI page</a>
+</body>
+</html>
 ```
-
-#### Get list of users
-
-```c++
-ENDPOINT_INFO(getUsers) {
-  info->summary = "get all stored users";
-  info->addResponse<List<Object<UserDto>>>(Status::CODE_200, "application/json");
-}
-ENDPOINT("GET", "demo/api/users", getUsers) {
-  return createDtoResponse(Status::CODE_200, m_database->getUsers());
-}
-```
-
-#### Delete User
-```c++
-ENDPOINT_INFO(deleteUser) {
-  info->summary = "Delete User by userId";
-  info->addResponse<String>(Status::CODE_200, "text/plain");
-  info->addResponse<String>(Status::CODE_404, "text/plain");
-}
-ENDPOINT("DELETE", "demo/api/users/{userId}", deleteUser,
-         PATH(Int32, userId)) {
-  bool success = m_database->deleteUser(userId);
-  OATPP_ASSERT_HTTP(success, Status::CODE_417, "User not deleted. Perhaps no such User in the Database");
-  return createResponse(Status::CODE_200, "User successfully deleted");
-}  
-```
-See /github-assets/crud-exe.png for example
+### Sample output/test-page
+![](https://raw.githubusercontent.com/ProjectGridIron/GridIron/master/github-assets/crud-exe.png)
