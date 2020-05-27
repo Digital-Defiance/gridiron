@@ -10,3 +10,6 @@ target_link_libraries(gridironControls gridiron)
 # CONFIGURE GRIDIRON
 target_compile_definitions(gridiron PUBLIC GRIDIRON_XHTML_NS=${GRIDIRON_XHTML_NS})
 target_compile_definitions(gridiron PUBLIC GRIDIRON_HTML_DOCROOT="${GRIDIRON_HTML_DOCROOT}")
+if(${GRIDIRON_VARTAG_SPACES})
+    target_compile_definitions(gridiron PUBLIC GRIDIRON_VARTAG_SPACES)
+endif()

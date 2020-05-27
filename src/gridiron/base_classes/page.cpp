@@ -310,7 +310,7 @@ Page::render() {
         // have a <%=varname%> from startpos up to (but not including) endpos
         std::string vartag = std::string(rendered.begin() + startpos + 3, rendered.begin() + endpos);
 
-#ifdef VARTAG_SPACES
+#ifdef GRIDIRON_VARTAG_SPACES
         // in place trim
         string_trunc_trim(vartag);
 #else
