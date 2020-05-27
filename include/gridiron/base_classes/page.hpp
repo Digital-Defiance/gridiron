@@ -67,6 +67,7 @@ namespace GridIron {
         var_map _regvars;            // registered variables for frontpage access
         node_map _nodemap;            // registered nodes
         std::string _htmlfile;        // front page filename
+        std::string _htmlfilepath;        // front page filename full path
         static const std::string _namespace;        // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
     private:
         void renderNode(tree<htmlnode>::sibling_iterator *thisnode, int level,

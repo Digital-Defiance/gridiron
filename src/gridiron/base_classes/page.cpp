@@ -50,7 +50,7 @@ Page::Page(const char *frontpage) : Control(frontpage, NULL) {
     if (frontpage != NULL) _htmlfile = std::string(frontpage);
     else _htmlfile = std::string("");
 
-    _id = std::string("_Page_") + _htmlfile;    // default id = "_Page_" or "_Page_foobar.html"
+    _id = std::string("_Page_").append(_htmlfile);    // default id = "_Page_" or "_Page_foobar.html"
     _enableviewstate = false;            // whether to output the viewstate
     _autonomous = Page::AllowAutonomous();        // not applicable, page classes cannot be autonomous
     _classtype = std::string(Page::ClassType());    // make our class type available in the base class
@@ -63,6 +63,7 @@ Page::Page(const char *frontpage) : Control(frontpage, NULL) {
 
     // open the front-page
     const std::string fullPagePath = GridIron::pathToPage(frontpage);
+    _htmlfilepath = fullPagePath;
     std::ifstream file(fullPagePath, std::ios_base::in);
     if (!file.is_open()) throw GridException(101, std::string("unable to open front-end page: ").append(fullPagePath).c_str());
 
@@ -101,7 +102,8 @@ Page::Page(const char *frontpage) : Control(frontpage, NULL) {
     }
 
     // add default registered variables
-    _regvars["__frontpage"] = &_htmlfile;
+    _regvars["__frontpage"] = &_htmlfilepath;
+    _regvars["__frontpage_file"] = &_htmlfile;
 
     // we sort of have a problem here. _namespace is constant. We don't want it to change
     // but we can't make the right hand side of the  map constant
