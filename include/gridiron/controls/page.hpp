@@ -66,8 +66,6 @@ namespace GridIron {
         static const std::string PathToPage();
 
     protected:
-        void Parse();
-
         tree<htmlnode> _tree;        // html tree
         var_map _regvars;            // registered variables for frontpage access
         node_map _nodemap;            // registered nodes

@@ -45,8 +45,8 @@ Label::Label(const char *id, unique_control_ptr parent, const char *text) : Cont
 Label::~Label() {
 }
 
-void
-Label::parse() {
+Label*
+Label::fromHtmlNode(htmlnode &node) {
     unique_page_ptr _Page = GetPage();
     if (_Page == nullptr) throw GridException(300, "Control must be attached to a page");
     if (_htmlNode == nullptr) throw GridException(301, "HTML Tag not found for this instance");
@@ -73,10 +73,6 @@ Label::parse() {
 std::ostream& operator<<(std::ostream& os, Label& label) {
     label.parse();
     htmlcxx::HTML::Node n;
-    GridIron::Tag tag("div");
-    n.tagName("div");
-    n.attributes();
-//    n.attribute()
     const char* foo = "<div style=\"align: left;\">" + _text.c_str() + "</div>";
 //    return oatpp::String(foo);
 

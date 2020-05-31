@@ -108,8 +108,6 @@ Page::Page(std::string frontPageFile) : Control(frontPageFile, NULL) : _renderTa
     // types with some sort of wrapper class?
 
     //_regvars["__namespace"] = &_namespace;
-
-    this->Page::parse(); // TODO: call parse up the control chain
 }
 
 unique_page_ptr Page::This() {
@@ -135,8 +133,8 @@ std::string Page::pathToPage() {
 // Parsing happens in two passes- one automatically at instantiation of the page that searches for autos
 // and the second when render is called. 
 // if the tree object has already been filled in, we know this is the second (or later) pass
-void
-Page::parse() {
+Page*
+Page::fromHtmlNode(htmlnode &node) {
     int controlcount = 0;            // how many custom controls we find
     bool firstpass = (_tree.size() == 0);        // have we already parsed this page?
 

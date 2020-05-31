@@ -195,6 +195,31 @@ namespace GridIron {
         _autonomous = isauto;
     }
 
+    static unique_control_ptr Control::fromHtmlNode(htmlnode &node) {
+        unique_page_ptr _Page = GetPage();
+        if (_Page == nullptr) throw GridException(300, "Control must be attached to a page");
+        if (node == nullptr) throw GridException(301, "HTML Tag not found for this instance");
+        Control c = Control();
+
+        // if there are child nodes, that will be the text for the label, should not override any text that has already been set.
+        // if _defaulttext == true, can override
+        // a shortcut to the below might be to read the parsed sibling/child
+
+        // only parse the original/default text if we need it (it hasn't been changed)
+        if (_defaulttext) {
+
+            std::string starttag = _htmlNode->text();
+            std::string endtag = _htmlNode->closingText();
+
+            _text = data->substr(_htmlNode->offset() + starttag.length(),
+                                 _htmlNode->length() - endtag.length() - starttag.length());
+        }
+
+        // if we're an autonomous Tag, automatically register the text string for access
+        // otherwise client will have to manually register if they want it accessible
+        if (_autonomous) _Page->RegisterVariable(_id + ".Text", &_text);
+    }
+
     // ------------------------------------------------
     // The following are used to allow us to instantiate control classes by type name as autonomous controls
     // Derived from Dr. Dobbs http://www.ddj.com/184410633

@@ -44,8 +44,6 @@ namespace GridIron {
 
             ~Label();
 
-            virtual void parse();
-
             inline void SetText(std::string value) {
                 _text = value;
                 _defaulttext = false;

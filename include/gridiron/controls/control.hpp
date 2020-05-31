@@ -95,6 +95,8 @@ namespace GridIron {
             _renderTagName = tagName; // eg "div"
         }
 
+        static unique_control_ptr fromHtmlNode(htmlnode &node);
+
     protected:
         inline static const bool AllowAutonomous() { return false; }        // can't have a base class anyway
         virtual bool
