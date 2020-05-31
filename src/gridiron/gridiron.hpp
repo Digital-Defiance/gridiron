@@ -17,14 +17,16 @@
 #define _GRIDIRON_HPP_
 
 // standard
-#include <vector>
-#include <string>
+#include <filesystem>
 #include <fstream>
+#include <regex>
+#include <sstream>
+#include <string>
+#include <vector>
 
 // htmlcxx
-#include <htmlcxx/html/ParserDom.h>
-#include <htmlcxx/html/utils.h>
-#include <htmlcxx/css/parser_pp.h>
+#include <htmlcxx2/src/htmlcxx2/kp_tree.hh>
+#include <htmlcxx2/src/htmlcxx2/htmlcxx2_html.hpp>
 
 #ifndef GRIDIRON_XHTML_NS
 #error "Please add -DGRIDIRON_XHTML_NS=gi"
@@ -35,10 +37,6 @@
 #endif
 
 namespace GridIron {
-    class Control;
-
-    // htmlnode
-    typedef htmlcxx::HTML::Node htmlnode;
 
     // parse/find control type in <gridiron::XType ...>
     std::pair<std::string, std::string> gridironParseTag(std::string tag);
@@ -49,5 +47,12 @@ namespace GridIron {
 
     std::string xmlEncode(std::string data);
 }
+
+// Include the rest of gridiron's most primitive values
+#include <gridiron/exceptions.hpp>
+#include <gridiron/property.hpp>
+#include <gridiron/controls/control.hpp>
+#include <gridiron/controls/value.hpp>
+#include <gridiron/controls/page.hpp>
 
 #endif

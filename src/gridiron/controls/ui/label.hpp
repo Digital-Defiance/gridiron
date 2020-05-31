@@ -24,10 +24,12 @@
 /* NOTE: at this point in time, this is just a proof of concept
  * much work needs to be done in populating this
  */
-
-#include <gridiron/controls/control.hpp>
 #include <string>
 #include <fstream>
+
+#include <gridiron/gridiron.hpp>
+#include <gridiron/controls/ui/label.hpp>
+
 
 namespace GridIron {
     class Control;
@@ -38,19 +40,15 @@ namespace GridIron {
 
         class Label : public Control {
         public:
-            Label(const char *id, unique_control_ptr parent);
-
-            Label(const char *id, unique_control_ptr parent, const char *text);
+            Label(const char *id, std::shared_ptr<Control> parent, std::string text = "");
 
             ~Label();
 
-            virtual void parse();
-
-            inline void SetText(std::string value) {
+            inline void Text(std::string value) {
                 _text = value;
                 _defaulttext = false;
             };    // set the text and mark it as changed
-            inline std::string GetText() { return _text; };
+            inline std::string Text() { return _text; };
 
             inline std::string *const GetTextPtr() { return &_text; };
 
@@ -63,8 +61,6 @@ namespace GridIron {
             inline int GetWidth() { return _width; };
 
             inline static const bool AllowAutonomous() { return true; }
-
-            friend std::ostream &operator<<(std::ostream &os, Label &label);
 
         private:
             bool _defaulttext;

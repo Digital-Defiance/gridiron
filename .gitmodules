@@ -1,0 +1,3 @@
+[submodule "src/htmlcxx"]
+	path = src/htmlcxx2
+	url = git@github.com:jessica-mulein/htmlcxx.git

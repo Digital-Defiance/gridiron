@@ -1,4 +1,4 @@
-# src/gridiron/base_classes/controls/ui/CMakeLists.txt
+# src/gridiron/controls/ui/CMakeLists.txt
 set(GRIDIRON_UI_CONTROLS_SOURCE_ROOT ${GRIDIRON_CONTROLS_SOURCE_ROOT}/ui)
 set(GRIDIRON_UI_CONTROLS_INCLUDE_ROOT ${GRIDIRON_CONTROLS_INCLUDE_ROOT}/ui)
 list(APPEND GRIDIRON_CONTROL_SOURCES

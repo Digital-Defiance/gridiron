@@ -10,7 +10,7 @@ set(GRIDIRON_XHTML_NS "\"gi\"")
 set(GRIDIRON_HTML_DOCROOT "html")
 set(GRIDIRON_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set(GRIDIRON_SOURCE_ROOT ${GRIDIRON_ROOT}/src/gridiron)
-set(GRIDIRON_INCLUDE_ROOT ${GRIDIRON_ROOT}/include/gridiron)
+set(GRIDIRON_INCLUDE_ROOT ${GRIDIRON_ROOT}/src/gridiron)
 
 project(gridiron
     LANGUAGES CXX
@@ -18,28 +18,21 @@ project(gridiron
 #    SOVERSION ${GRIDIRON_VERSION_MAJOR}
     DESCRIPTION "GridIron C++ framework"
 )
-find_package(HtmlCxx REQUIRED)
-find_package(oatpp          1.1.0 REQUIRED)
-#find_library(oatpp          1.1.0 REQUIRED)
-find_package(oatpp-swagger  1.1.0 REQUIRED)
 
 include_directories(SYSTEM PUBLIC ${HTMLCXX_INCLUDE_DIRS})
-include_directories(SYSTEM PUBLIC ${oatpp_INCLUDE_DIRS})
-
 set(CMAKE_REQUIRED_LIBRARIES ${HTMLCXX_LIBRARY})
 
-include_directories(SYSTEM PUBLIC include)
+# CONFIGURE GRIDIRON
+set(GRIDIRON_COMPILE_DEFS
+    PUBLIC GRIDIRON_XHTML_NS=${GRIDIRON_XHTML_NS}
+    PUBLIC GRIDIRON_HTML_DOCROOT="${GRIDIRON_HTML_DOCROOT}"
+)
 
 # Only do these if this is the main project, and not if it is included through add_subdirectory
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    # CONFIGURE GRIDIRON
-    add_compile_definitions(PUBLIC GRIDIRON_XHTML_NS=${GRIDIRON_XHTML_NS})
-    add_compile_definitions(PUBLIC GRIDIRON_HTML_DOCROOT="${GRIDIRON_HTML_DOCROOT}")
-
     # Optionally set things like CMAKE_CXX_STANDARD, CMAKE_POSITION_INDEPENDENT_CODE here
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
-    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
     # Let's ensure -std=c++xx instead of -std=g++xx
     set(CMAKE_CXX_EXTENSIONS OFF)

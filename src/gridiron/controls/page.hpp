@@ -26,32 +26,25 @@
 #ifndef _PAGE_HPP_
 #define _PAGE_HPP_
 
+// STL
+#include <fstream>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <string>
+#include <typeinfo>
+#include <vector>
+
 // local
 #include <gridiron/gridiron.hpp>
-#include <gridiron/controls/control.hpp>
-// STL
-#include <vector>
-#include <string>
-#include <map>
-#include <fstream>
-#include <memory>
 
 namespace GridIron {
-    class Page;
-
-    class Control;
-
-    // map node instances to control instances
-    typedef std::map<const htmlnode *, Control *> node_map;
-    // map variable names to their data
-    typedef std::map<const std::string, std::string *> var_map;
-
     // page classes are derived from control classes. They must have no parent (NULL).
     class Page : public Control {
     public:
-        Page(std::string frontPage);
+        Page(std::string codeBesideFilename);
 
-        unique_page_ptr This();
+        ROProperty<std::shared_ptr<Page>> This;
 
         ~Page();
 
@@ -65,12 +58,18 @@ namespace GridIron {
 
         static const std::string PathToPage();
 
-    protected:
-        void Parse();
+        inline static const bool IsPage = true;
 
-        tree<htmlnode> _tree;        // html tree
-        var_map _regvars;            // registered variables for frontpage access
-        node_map _nodemap;            // registered nodes
+        inline kp::tree<htmlcxx2::HTML::Node>* HtmlTree() {
+            return &_tree;
+        }
+
+        static std::shared_ptr<Page> fromHtmlNode(htmlcxx2::HTML::Node &node);
+
+    protected:
+        kp::tree<htmlcxx2::HTML::Node> _tree;        // html tree
+        std::map<const std::string, RWProperty<char *>> _regvars;            // registered variables for frontpage access
+        std::map<const htmlcxx2::HTML::Node *, std::shared_ptr<GridIron::Control>> _nodemap;            // registered nodes
         std::string _htmlFile;        // front page filename
         std::string _htmlFilepath;        // front page filename full path
     };

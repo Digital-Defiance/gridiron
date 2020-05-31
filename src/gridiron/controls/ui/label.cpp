@@ -22,69 +22,64 @@
  * much work needs to be done in populating this
  */
 
-#include <gridiron/exceptions.hpp>
-#include <gridiron/base_classes/page.hpp>
-#include <gridiron/base_classes/controls/ui/label.hpp>
-#include <gridiron/base_classes/tag.hpp>
+#include <gridiron/controls/ui/label.hpp>
 
-using namespace GridIron;
-using namespace GridIron::controls;
+namespace GridIron {
+    using namespace GridIron::controls;
 
-Label::Label(const char *id, unique_control_ptr parent) : Control(id) {
-    // nothing extra
-    _text = std::string("");
-    _defaulttext = true;        // text has not been overriden/changed
-}
-
-Label::Label(const char *id, unique_control_ptr parent, const char *text) : Control(id, parent) {
-    // copy text
-    _text = std::string(text);
-    _defaulttext = false;        // text has been overridden/changed
-}
-
-Label::~Label() {
-}
-
-void
-Label::parse() {
-    unique_page_ptr _Page = GetPage();
-    if (_Page == nullptr) throw GridException(300, "Control must be attached to a page");
-    if (_htmlNode == nullptr) throw GridException(301, "HTML Tag not found for this instance");
-
-    // if there are child nodes, that will be the text for the label, should not override any text that has already been set.
-    // if _defaulttext == true, can override
-    // a shortcut to the below might be to read the parsed sibling/child
-
-    // only parse the original/default text if we need it (it hasn't been changed)
-    if (_defaulttext) {
-
-        std::string starttag = _htmlNode->text();
-        std::string endtag = _htmlNode->closingText();
-
-        _text = data->substr(_htmlNode->offset() + starttag.length(),
-                             _htmlNode->length() - endtag.length() - starttag.length());
+    Label::Label(const char *id, std::shared_ptr<Control> parent, std::string text) : Control(id, parent) :
+        Namespace{GRIDIRON_XHTML_NS},
+        tagName_{GRIDIRON_XHTML_NS + "::Label"},
+        RenderTag{"div"}
+    {
+        // copy text
+        _text = std::string(text);
+        _defaulttext = text.empty();
+        parent->GetPage().RegisterVariable(_id.append(".Text"), lblTest.GetTextPtr());
     }
 
-    // if we're an autonomous Tag, automatically register the text string for access
-    // otherwise client will have to manually register if they want it accessible
-    if (_autonomous) _Page->RegisterVariable(_id + ".Text", &_text);
+    Label::~Label() {
+    }
+
+    static
+    std::shared_ptr<Label>
+    Label::fromHtmlNode(htmlcxx2::HTML::Node &node) {
+        std::shared_ptr<Page> _Page = GetPage();
+        if (_Page == nullptr) throw GridException(300, "Control must be attached to a page");
+
+        // if there are child nodes, that will be the text for the label, should not override any text that has already been set.
+        // if _defaulttext == true, can override
+        // a shortcut to the below might be to read the parsed sibling/child
+
+        // only parse the original/default text if we need it (it hasn't been changed)
+        if (_defaulttext) {
+
+            std::string starttag = node->text();
+            std::string endtag = node->closingText();
+
+            _text = data->substr(node->offset() + starttag.length(),
+                                 node->length() - endtag.length() - starttag.length());
+        }
+
+        // if we're an autonomous Tag, automatically register the text string for access
+        // otherwise client will have to manually register if they want it accessible
+        if (_autonomous) _Page->RegisterVariable(_id + ".Text", &_text);
+    }
+
+
+    friend std::ostream& operator<<(std::ostream& os, Label& label) {
+        label.parse();
+        htmlcxx2::HTML::Node n;
+        // TODO: use namespace::tagname, render out all the HTML attributes
+        const char* foo = "<div style=\"align: left;\">" + label. _text.c_str() + "</div>";
+    //    return oatpp::String(foo);
+
+        return os;
+    }
+
+    ////////////////////////////////////////////////////////////
+    // Declare an instance of the proxy to register the
+    // existence of Label with the ControlFactory
+    // !! only do this for classes that support autos !!
+    static GridIron::ControlFactoryProxy<GridIron::controls::Label> globalLabelProxy;
 }
-
-std::ostream& operator<<(std::ostream& os, Label& label) {
-    label.parse();
-    htmlcxx::HTML::Node n;
-    GridIron::Tag tag("div");
-    n.tagName("div");
-    n.attributes();
-//    n.attribute()
-    const char* foo = "<div style=\"align: left;\">" + _text.c_str() + "</div>";
-//    return oatpp::String(foo);
-
-    return os;
-}
-
-////////////////////////////////////////////////////////////
-// Declare an instance of the proxy to register the
-// existence of Label with the ControlFactory
-// !! only do this for classes that support autos !!
-static GridIron::ControlFactoryProxy<GridIron::controls::Label> globalLabelProxy;

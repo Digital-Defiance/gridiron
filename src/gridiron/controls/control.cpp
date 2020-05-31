@@ -21,28 +21,28 @@
  * supplied by a Page class's parsing operation.
  ***************************************************************************************/
 
-#include <gridiron/base_classes/page.hpp>
-#include <gridiron/base_classes/controls/control.hpp>
+#include <gridiron/controls/control.hpp>
 
 namespace GridIron {
 
-    Control::Control(const char *id, unique_control_ptr parent) {
-        unique_control_ptr result = nullptr;
-        unique_page_ptr _Page;
+    Control::Control(const char *id, std::shared_ptr<Control> parent) :
+        This{std::shared_from_this()},
+        Namespace{GRIDIRON_XHTML_NS},
+        tagName_{GRIDIRON_XHTML_NS + "::Control"},
+        RenderTag{"div"}
+    {
+        std::shared_ptr<Control> result = nullptr;
+        std::shared_ptr<Page> _Page;
 
         // INITIALIZE VARIABLES
         // our id
         _id = std::string(id);
         // our parent, as given
-        _parent.swap(parent);
+        _parent = parent;
         // whether this page should be serialized into the viewstate
         _viewStateEnabled = false;
         // whether this is an autonomous control - affects behavior in derived classes
         _autonomous = false;
-        // this is a pointer to the html Tag associated with this instance
-        _htmlNode = nullptr;
-        _controlTagName = "Control";
-        _renderTagName = "div"; // default to div
 
         // we must have an ID- and only one instance of an id may exist on all controls under a page object
         if (_id.length() == 0) throw GridException(200, "no id specified");
@@ -60,23 +60,19 @@ namespace GridIron {
         }
     }
 
-    std::ostream& operator<<(std::ostream& os, const Control& control) {
-        os << control._htmlNode;
+    friend std::ostream& operator<<(std::ostream& os, const Control& control) {
+        os << control.HtmlNode();
         return os;
-    }
-
-    unique_control_ptr Control::This() {
-        return std::unique_ptr<Control>(this);
     }
 
     // find the bottom-most control, regardless of type
     // returns: pointer - may be self
-    unique_control_ptr
+    std::shared_ptr<Control>
     Control::GetRoot(void) {
-        unique_control_ptr ptr = This();
+        std::shared_ptr<Control> ptr = This();
 
         while (ptr->_parent != nullptr) {
-            return _parent->This();
+            ptr = ptr->_parent->This();
         }
 
         return ptr;
@@ -84,46 +80,47 @@ namespace GridIron {
 
     // fine the bottom-most control, only if a Page object
     // returns: pointer on success or nullptr, may be self
-    unique_page_ptr
+    std::shared_ptr<Control>
     Control::GetPage(void) {
-        unique_control_ptr ptr = GetRoot();
-        Control *p = ptr.get();
-        if (!Page::instanceOf<Page>(p)) return nullptr;
-        else return ((Page *) p)->This();
+        std::shared_ptr<Control> ptr = GetRoot();
+        if (ptr->instanceOf<Page>()) {
+            return static_cast<std::shared_ptr<Page>>(ptr);
+        }
+        return nullptr;
     }
 
-    unique_control_ptr
+    std::shared_ptr<Control>
     Control::Find(Control& control) {
         // check map
-        std::map<Control*, unique_control_ptr>::iterator it = _controlsByControl.find(&control);
+        std::map<Control*, std::shared_ptr<Control>>::iterator it = _controlsByControl.find(&control);
         if (it != _controlsByControl.end()) {
             return it->first->This();
         }
         // not found, create a shared pointer
-        unique_control_ptr spC = unique_control_ptr (&control);
+        std::shared_ptr<Control> spC = std::shared_ptr<Control> (&control);
         // add to map
-        std::pair<std::map<Control*, unique_control_ptr>::iterator,bool> inserted = _controlsByControl.insert(std::make_pair(&control,std::move(spC)));
-        // return the unique pointer
+        std::pair<std::map<Control*, std::shared_ptr<Control>>::iterator,bool> inserted = _controlsByControl.insert(std::make_pair(&control,std::move(spC)));
+        // return the shared pointer
         return inserted.first->first->This();
     }
 
     // recursive search through all controls under this object, return the one with specified id
-    unique_control_ptr
+    std::shared_ptr<Control>
     Control::FindByID(const std::string id, bool searchParentsIfNotChild) {
 
         // prioritize children first. if the end user wants to be efficient for a tree-wide search, start at root
         if (_children.size() > 0) {
             // search immediate children first
-            for (vector_control_children::iterator it = _children.begin(); it != _children.end(); ++it) {
+            for (std::vector<std::shared_ptr<Control>>::iterator it = _children.begin(); it != _children.end(); ++it) {
                 // check the child's id first
                 if ((**it).ID() == id) {
-                    return (std::static_pointer_cast<unique_control_ptr>(*it));
+                    return (std::static_pointer_cast<std::shared_ptr<Control>>(*it));
                 }
             }
         }
 
         if (searchParentsIfNotChild) {
-            control_map::iterator it = _controlsByID.find(id);
+            std::map<std::string, std::shared_ptr<Control>>::iterator it = _controlsByID.find(id);
             if (it != _controlsByID.end()) {
                 return it->second;
             }
@@ -133,13 +130,13 @@ namespace GridIron {
         return nullptr;
     }
 
-    std::ostream &Control::fullName(std::ostream &os) {
-        os << this->getNamespace() << "::" << this->_controlTagName;
+    std::ostream &Control::NamespacedTag(std::ostream &os) {
+        os << this->Namespace << "::" << this->Tag;
         return os;
     }
 
-    std::string Control::fullName() {
-        return (this->getNamespace() + "::" + this->_controlTagName)
+    std::string Control::NamespacedTag() {
+        return (this->Namespace + "::" + this->Tag)
     }
 
     // register this control with the parent
@@ -148,13 +145,13 @@ namespace GridIron {
         if (id.empty() || (control == nullptr)) return false;
 
         // check for duplicates first
-        for (vector_control_children ::iterator it = _children.begin(); it != _children.end(); ++it) {
+        for (std::vector<std::shared_ptr<Control>> ::iterator it = _children.begin(); it != _children.end(); ++it) {
             if ((*it)->ID() == id) return false;    // id already in list
         }
 
 
         // then add
-        unique_control_ptr spC = std::make_shared<Control>(control);
+        std::shared_ptr<Control> spC = std::make_shared<Control>(control);
         _children.push_back(new std::shared_ptr<Control>(control));
         std::cerr << "There are now " << _children.size() << " children registered." << std::endl;
 
@@ -164,7 +161,7 @@ namespace GridIron {
     // unregister this control from the parent
     bool
     Control::unregister_child(std::string &id) {
-        for (control_map::iterator i = _children.begin(), iend = _children.end(); i != iend; ++i) {
+        for (std::map<std::string, std::shared_ptr<Control>>::iterator i = _children.begin(), iend = _children.end(); i != iend; ++i) {
             if (*(i->first) == id) {
                 _children.erase(i);
                 return true;
@@ -180,19 +177,35 @@ namespace GridIron {
         if (_parent != nullptr) _parent->unregister_child(_id);
     }
 
-    // allow page class to tell us where our data is
-    void
-    Control::SetHTMLNode(htmlnode *node) {
-        if ((_htmlNode != nullptr) && (node != nullptr)) {
-            throw GridException(500, "HTMLNode already associated");
-        }
-        _htmlNode = node;
-    }
-
     // allow the page class to tell us we're an anonymous instance
     void
     Control::SetAutonomous(bool isauto) {
         _autonomous = isauto;
+    }
+
+    static std::shared_ptr<Control> Control::fromHtmlNode(htmlcxx2::HTML::Node &node) {
+        _Page = GetPage();
+        if (_Page == nullptr) throw GridException(300, "Control must be attached to a page");
+        if (node == nullptr) throw GridException(301, "HTML Tag not found for this instance");
+        Control c = Control();
+
+        // if there are child nodes, that will be the text for the label, should not override any text that has already been set.
+        // if _defaulttext == true, can override
+        // a shortcut to the below might be to read the parsed sibling/child
+
+        // only parse the original/default text if we need it (it hasn't been changed)
+        if (_defaulttext) {
+
+            std::string starttag = node->text();
+            std::string endtag = node->closingText();
+
+            _text = data->substr(node->offset() + starttag.length(),
+                                 node->length() - endtag.length() - starttag.length());
+        }
+
+        // if we're an autonomous Tag, automatically register the text string for access
+        // otherwise client will have to manually register if they want it accessible
+        if (_autonomous) _Page->RegisterVariable(_id + ".Text", &_text);
     }
 
     // ------------------------------------------------
@@ -237,8 +250,8 @@ namespace GridIron {
     }
 
     // iterates through the control types that have registered, tells the proxy to create us one if its type matches
-    Control *
-    ControlFactory::CreateByType(const char *type, const char *id, Control *parent) {
+    std::shared_ptr<Control>
+    ControlFactory::CreateByType(const char *type, const char *id, std::shared_ptr<Control> parent) {
         std::cerr << "Requesting creation of type " << type << std::endl;
         for (int i = 0; i < _controlProxies->size(); ++i) {
             if (strcmp(_controlProxies->at(i)->GetType(), type) == 0) {
