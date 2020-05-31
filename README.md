@@ -86,7 +86,7 @@ $ docker run -p 8000:8000 -t example-crud
 ```
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html lang="en">
+<gi::Page lang="en">
 <head>
     <meta charset="utf-8" />
     <title>GridIron Test Page</title>
@@ -141,7 +141,7 @@ $ docker run -p 8000:8000 -t example-crud
 </table>
 <a href="swagger/ui">Checkout Swagger-UI page</a>
 </body>
-</html>
+</gi::Page>
 ```
 ### Sample output/test-page
 ![](https://raw.githubusercontent.com/ProjectGridIron/GridIron/master/github-assets/gridiron-demo.png)
