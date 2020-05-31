@@ -15,6 +15,6 @@ jobs:
     - name: checkout
       uses: actions/checkout@v2
     - name: prerequisites
-      run: sudo apt-get install libboost-all-dev libhtmlcxx-dev
+      run: sudo apt-get install libhtmlcxx-dev
     - name: run-cmake
       uses: lukka/run-cmake@v2.5
