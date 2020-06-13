@@ -92,9 +92,6 @@
         _regvars[".namespace"] = std::string(GRIDIRON_XHTML_NS).c_str();
     }
 
-    Page::~Page() {
-    }
-
     std::string Page::pathToPage(std::string frontPage) {
         std::filesystem::path basePath = std::filesystem::current_path();
         return basePath.append(GRIDIRON_HTML_DOCROOT).append(frontPage);

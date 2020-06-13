@@ -38,9 +38,6 @@ namespace GridIron {
         parent->GetPage().RegisterVariable(_id.append(".Text"), lblTest.GetTextPtr());
     }
 
-    Label::~Label() {
-    }
-
     static
     std::shared_ptr<Label>
     Label::fromHtmlNode(htmlcxx2::HTML::Node &node) {

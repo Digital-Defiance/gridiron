@@ -46,7 +46,7 @@ namespace GridIron {
         static ROProperty<std::string> Namespace;         // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
         static ROProperty<std::string> RenderTag;    // the associated codebeside tag name eg <namespace>::<tag>
 
-        virtual ~Control();                                    // destructor
+        ~Control();                                    // destructor
         std::shared_ptr<Control> // TODO: change to Page
         GetPage();                                        // return pointer to parent page object (or self for page)
         std::shared_ptr<Control>

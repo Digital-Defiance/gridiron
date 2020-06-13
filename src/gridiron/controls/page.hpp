@@ -39,14 +39,14 @@
 #include <gridiron/gridiron.hpp>
 
 namespace GridIron {
+    class Control;
+
     // page classes are derived from control classes. They must have no parent (NULL).
     class Page : public Control {
     public:
         Page(std::string codeBesideFilename);
 
         ROProperty<std::shared_ptr<Page>> This;
-
-        ~Page();
 
         friend std::ostream &operator<<(std::ostream &os, const Control &control);
 

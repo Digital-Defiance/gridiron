@@ -42,8 +42,6 @@ namespace GridIron {
         public:
             Label(const char *id, std::shared_ptr<Control> parent, std::string text = "");
 
-            ~Label();
-
             inline void Text(std::string value) {
                 _text = value;
                 _defaulttext = false;
