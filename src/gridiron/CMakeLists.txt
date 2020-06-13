@@ -1,9 +1,9 @@
 # src/gridiron/CMakeLists.txt
 set(GRIDIRON_SOURCES
     ${GRIDIRON_INCLUDE_ROOT}/exceptions.hpp
-    ${GRIDIRON_SOURCE_ROOT}/gridiron.cpp
-    ${GRIDIRON_INCLUDE_ROOT}/gridiron.hpp
     ${GRIDIRON_INCLUDE_ROOT}/property.hpp
+    ${GRIDIRON_INCLUDE_ROOT}/gridiron.hpp
+    ${GRIDIRON_SOURCE_ROOT}/gridiron.cpp
 ${GRIDIRON_CONTROL_SOURCES}
 )
 
