@@ -31,7 +31,9 @@
 #include <vector>
 #include <map>
 #include <memory>
-#include <gridiron/node.hpp>
+#include <gridiron/properties.hpp>
+#include <gridiron/exceptions.hpp>
+#include <gridiron/Node.hpp>
 
 namespace GridIron {
     enum ControlPass {

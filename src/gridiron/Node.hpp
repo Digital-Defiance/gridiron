@@ -1,7 +1,8 @@
 #ifndef GRIDIRON_NODE_HPP
 #define GRIDIRON_NODE_HPP
 
-#include <htmlcxx2/src/htmlcxx2/htmlcxx2_html.hpp>
+#include <htmlcxx2/htmlcxx2_html.hpp>
+#include <htmlcxx2/kp_tree.hh>
 
 namespace GridIron {
     class Node : public htmlcxx2::HTML::Node {

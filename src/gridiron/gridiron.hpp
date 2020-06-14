@@ -24,11 +24,6 @@
 #include <string>
 #include <vector>
 
-// htmlcxx
-#include <htmlcxx2/src/htmlcxx2/kp_tree.hh>
-#include <htmlcxx2/src/htmlcxx2/htmlcxx2_html.hpp>
-#include <gridiron/node.hpp>
-
 #ifndef GRIDIRON_XHTML_NS
 #error "Please add -DGRIDIRON_XHTML_NS=gi"
 #endif
@@ -40,7 +35,7 @@
 namespace GridIron {
 
     // parse/find control type in <gridiron::XType ...>
-    std::pair<std::string, std::string> gridironParseTag(std::string tag);
+    static std::pair<std::string, std::string> gridironParseTag(std::string tag);
 
     std::ostream &xmlEncode(std::string &data, std::ostream &os);
 
@@ -48,27 +43,11 @@ namespace GridIron {
 
     std::string xmlEncode(std::string data);
 
-    enum PageStatus {
-        INITIALIZING,   // configuring dependencies and resources
-        INIT_READING,   // reading code-beside file
-        INIT_PARSING,   // parsing the read HTML DOM
-        PARSED_READY,   // class has finished initializing
-        MATCHING,       // Matching classes to parsed nodes
-        MATCHED_READY,  // logically there is another READY pause here prior to rendering being triggered
-        RENDERING,      // streaming data to standard out
-        RENDERED_READY  // streaming has completed
-    };
+    template<typename Base, typename T = Base>
+    static inline bool instanceOf(std::shared_ptr<Base> p) {
+        std::shared_ptr<Base> temp = std::dynamic_pointer_cast<T>(p);
+        return temp.get() != nullptr;
+    }
 }
-
-#include <gridiron/exceptions.hpp>
-#include <gridiron/property.hpp>
-#include <gridiron/controls/control.hpp>
-#if !defined GRIDIRON_NESTED_EXCLUDE_VALUE
-#include <gridiron/controls/value.hpp>
-#endif
-#if !defined GRIDIRON_NESTED_EXCLUDE_PAGE
-#include <gridiron/controls/page.hpp>
-#endif
-// Include the rest of gridiron's most primitive values
 
 #endif

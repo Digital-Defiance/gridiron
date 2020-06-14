@@ -23,9 +23,8 @@
  * supplied by a Page class's parsing operation.
  ***************************************************************************************/
 
-#include <fmt/include/fmt/printf.h>
 
-#include <gridiron/controls/page.hpp>
+#include <gridiron/controls/Page.hpp>
 
 namespace GridIron {
     Page::Page(const char *codeBesideFilename) : Control(codeBesideFilename, NULL),
@@ -61,8 +60,8 @@ namespace GridIron {
         HtmlFilepath = ROProperty<std::string>(fullPagePath);
 
         // add/link default registered variables
-        _regvarsRW.insert({std::string(GRIDIRON_XHTML_NS).append(".frontPage"), std::shared_ptr<std::string>(_htmlFilepath)});
-        _regvarsRW.insert({std::string(GRIDIRON_XHTML_NS).append(".codeBesideFilename"), &_htmlFile});
+        _regvarsRW.insert({std::string(GRIDIRON_XHTML_NS).append(".FrontPage"), std::shared_ptr<std::string>(_htmlFilepath)});
+        _regvarsRW.insert({std::string(GRIDIRON_XHTML_NS).append(".CodeBesideFilename"), &_htmlFile});
 
         // we sort of have a problem here. _namespace is constant. We don't want it to change
         // but we can't make the right hand side of the  map constant
@@ -181,7 +180,7 @@ namespace GridIron {
                                           << ", id=" << idresult.second << std::endl;
 
                                 // make sure the instance with that ID is the same type as the control Tag
-                                if (!(Control::instanceOf<Control>(instance))) {
+                                if (!(GridIron::instanceOf<Controll>(instance))) {
                                     std::cerr << "ERROR: instance with that id is not a " << tagType << std::endl;
 
                                 } else {

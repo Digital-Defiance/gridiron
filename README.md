@@ -22,7 +22,7 @@ Oat++ is a C++ webserver/lightweight framework with a great many useful features
 Grid(Network/The Internet) Iron("Big Iron"/Server/Mainframe)
 
 ## What is "code-beside"?
-I made it up. ASP.Net (C#.Net/VB.Net/ASP Classic) is essentially XHTML frontends with functional programming backends. In this sense, Project GridIron is much the same, but based on C++ and the [Oat++ Framework](https://oatpp.io/). Project GridIron does require some minimal boilerplate code, though the pattern will hopefully get "DRY'd up" a little more soon. Interestingly though, Project GridIron brings something I call "autonomous controls" which are <gi:Label auto="true" id="lblTest">Value</gi:Label> instances that automatically create  instances that self-register with the Page and instantly allow another place in the XHTML to reference it by its ID, all without writing any backend code at all. <gi::Value key="lblTest.Text" /> would be automatically replaced with "Value". Chaining the value across multiple controls is not yet supported and the behavior will likely cause a crash or loop.
+I made it up. ASP.Net (C#.Net/VB.Net/ASP Classic) is essentially XHTML frontends with functional programming backends. In this sense, Project GridIron is much the same, but based on C++ and the [Oat++ Framework](https://oatpp.io/). Project GridIron does require some minimal boilerplate code, though the pattern will hopefully get "DRY'd up" a little more soon. Interestingly though, Project GridIron brings something I call "autonomous controls" which are <gi:Label auto="true" id="lblTest">ContentValue</gi:Label> instances that automatically create  instances that self-register with the Page and instantly allow another place in the XHTML to reference it by its ID, all without writing any backend code at all. <gi::ContentValue key="lblTest.Text" /> would be automatically replaced with "ContentValue". Chaining the value across multiple controls is not yet supported and the behavior will likely cause a crash or loop.
 In summation, although some minimal boiler code is required to associate a page's C++ and XHTML files, the XHTML and C++ are essentially equal partners, hence "code-beside".
 
 ### Project layout
@@ -90,11 +90,11 @@ Example endpoint boilerplate (*the render mechanism is about to change)
     </tr>
     <tr>
         <td align="left"><b>Front Page:</b></td>
-        <td align="left"><gi::Value key="gridiron.frontPage" /></td>
+        <td align="left"><gi::ContentValue key="gridiron.FrontPage" /></td>
     </tr>
     <tr>
         <td align="left"><b>Front Page File:</b></td>
-        <td align="left"><gi::Value key="gridiron.codeBesideFilename /></td>
+        <td align="left"><gi::ContentValue key="gridiron.CodeBesideFilename /></td>
     </tr>
     <tr>
         <th align="left" bgcolor="#dedede" colspan="2">gi::Label Test<br>
@@ -110,7 +110,7 @@ Example endpoint boilerplate (*the render mechanism is about to change)
     </tr>
     <tr>
         <td align="left"><b>lblTest.Text:</b></td>
-        <td align="left"><gi::Value key="lblTest.Text" /></td>
+        <td align="left"><gi::ContentValue key="lblTest.Text" /></td>
     </tr>
     <tr>
         <th align="left" bgcolor="#dedede" colspan="2">Autonomous gi::Label Test<br>
@@ -126,7 +126,7 @@ Example endpoint boilerplate (*the render mechanism is about to change)
     </tr>
     <tr>
         <td align="left"><b>lblAutoTest.Text:</b></td>
-        <td align="left"><gi::Value key="lblAutoTest.Text" /></td>
+        <td align="left"><gi::ContentValue key="lblAutoTest.Text" /></td>
     </tr>
 </table>
 </body>

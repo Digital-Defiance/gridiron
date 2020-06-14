@@ -16,7 +16,7 @@
 # You should have received a copy of the GNU General Public License
 # along with MathWebSearch.  If not, see <http://www.gnu.org/licenses/>.
 #
-# FindByID htmlcxx headers and libraries.
+# Find htmlcxx headers and libraries.
 #
 #  HTMLCXX_INCLUDE_DIRS - where to find htmlcxx/html/tree.h, etc.
 #  HTMLCXX_LIBRARIES    - List of libraries when using HTMLCXX.

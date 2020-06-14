@@ -35,12 +35,23 @@
 #include <typeinfo>
 #include <vector>
 
+#include <fmt/include/fmt/printf.h>
+
 // local
-#define GRIDIRON_NESTED_EXCLUDE_PAGE
-#include <gridiron/gridiron.hpp>
+#include <gridiron/controls/Control.hpp>
+#include <gridiron/properties.hpp>
 
 namespace GridIron {
-    class Control;
+    enum PageStatus {
+        INITIALIZING,   // configuring dependencies and resources
+        INIT_READING,   // reading code-beside file
+        INIT_PARSING,   // parsing the read HTML DOM
+        PARSED_READY,   // class has finished initializing
+        MATCHING,       // Matching classes to parsed nodes
+        MATCHED_READY,  // logically there is another READY pause here prior to rendering being triggered
+        RENDERING,      // streaming data to standard out
+        RENDERED_READY  // streaming has completed
+    };
 
     // page classes are derived from control classes. They must have no parent (NULL).
     class Page : public Control {

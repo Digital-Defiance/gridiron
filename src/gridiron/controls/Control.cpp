@@ -22,6 +22,7 @@
  ***************************************************************************************/
 
 #include <gridiron/gridiron.hpp>
+#include <gridiron/controls/Control.hpp>
 
 namespace GridIron {
 
@@ -70,16 +71,22 @@ namespace GridIron {
         return ptr;
     }
 
-    // fine the bottom-most control, only if a Page object
+    // find the bottom-most control, only if a Page object
     // returns: pointer on success or nullptr, may be self
     std::shared_ptr<Page>
-    Control::GetPage(void) {
-        std::shared_ptr<Control> ptr = GetRoot();
-        if (Page::instanceOf<Page>(ptr)) {
-            Page *p = dynamic_cast<Page *>(ptr.get());
-            return std::static_pointer_cast<Page>(p->This.get());
+    Control::GetPage(bool rootOnly = false) {
+        std::shared_ptr<Control> ptr = This;
+
+        // short circuit if already on page and either not rootOnly search or our parent is null (we're root)
+        if (GridIron::instanceOf<Control, Page>(ptr) && (!rootOnly || !ptr->Parent))) {
+            return This;
+        } else if (!ptr->Parent) {
+            // if no parent left to check either, we can just return now
+            return nullptr;
         }
-        return nullptr;
+
+        // recursive call
+        return This->Parent->GetPage(readOnly);
     }
 
     std::shared_ptr<Control>

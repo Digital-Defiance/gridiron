@@ -5,7 +5,7 @@
 #ifndef GRIDIRON_PROPERTY_H
 #define GRIDIRON_PROPERTY_H
 
-#include <gridiron/node.hpp>
+#include <gridiron/Node.hpp>
 
 namespace GridIron {
     template <class T>
@@ -188,7 +188,7 @@ namespace GridIron {
         void set( T const & value ); // reserved but not implemented, per C++/CLI
 
         // use on rhs of '='
-        operator bool() const
+        explicit operator bool() const
         {
             return (originalData.get() == comparedData.get());
         }
@@ -200,7 +200,6 @@ namespace GridIron {
     class AttributeMappedProperty : BaseProperty<T> {
     protected:
         const GridIron::Node node_;
-        bool changed_ = false;
         T original;
         T data;
     public:
@@ -264,6 +263,66 @@ namespace GridIron {
         inline T operator=(T const &value) {
             node_.updateAttribute(std::to_string(data), value);
             return data;
+        }
+
+        typedef T value_type; // might be useful for template deductions
+    };
+
+    template <class T>
+    class ContentMappedProperty : BaseProperty<T> {
+    protected:
+        bool changed_ = false;
+        const GridIron::Node node_;
+        T original;
+    public:
+        // access with function call syntax
+        ContentMappedProperty(T attributeData, GridIron::Node &node) : node_{node} {
+            // locate the original attribute value and source the value
+            this->node_.text_ = std::to_string(attributeData);
+            this->original = std::to_string(attributeData);
+            this->changed_ = (this->original != node_.text_);
+        }
+        ContentMappedProperty(ContentMappedProperty &property) {
+            this->node_ = property.node_; // swap underlying nodes
+            this->original = property.original;
+            this->changed_ = property.changed_;
+        }
+
+        inline std::string operator()() const {
+            return this->node_.text_;
+        }
+
+        inline std::string operator()(T const &value) {
+            this->node_.text_ = std::to_string(value);
+            return this->node_.text_;
+        }
+
+        friend inline std::ostream &operator<<(std::ostream &os, ContentMappedProperty &property) {
+            os << property.get();
+            return os;
+        }
+
+        // access with get()/set() syntax
+        inline std::string get() const {
+            return this->node_.text_;
+        }
+
+        inline std::string set(T const &value) {
+            this->node_.text_ = std::to_string(value);
+            return this->node_.text_;
+        }
+
+        // access with '=' sign
+        // in an industrial-strength library,
+        // specializations for appropriate types might choose to
+        // add combined operators like +=, etc.
+        inline operator std::string() const {
+            return get();
+        }
+
+        inline std::string operator=(T const &value) {
+            this->node_.text_ = std::to_string(value);
+            return this->node_.text_;
         }
 
         typedef T value_type; // might be useful for template deductions

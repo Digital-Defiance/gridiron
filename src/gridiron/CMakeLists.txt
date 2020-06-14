@@ -1,7 +1,7 @@
 # src/gridiron/CMakeLists.txt
 set(GRIDIRON_SOURCES
     ${GRIDIRON_INCLUDE_ROOT}/exceptions.hpp
-    ${GRIDIRON_INCLUDE_ROOT}/property.hpp
+    ${GRIDIRON_INCLUDE_ROOT}/properties.hpp
     ${GRIDIRON_INCLUDE_ROOT}/gridiron.hpp
     ${GRIDIRON_SOURCE_ROOT}/gridiron.cpp
 ${GRIDIRON_CONTROL_SOURCES}
@@ -14,9 +14,18 @@ add_subdirectory(html)
 add_library(gridiron-object OBJECT ${GRIDIRON_SOURCES})
 add_library(gridiron-static STATIC $<TARGET_OBJECTS:gridiron-object>)
 add_library(gridiron-shared SHARED $<TARGET_OBJECTS:gridiron-object>)
-target_sources(gridiron-object INTERFACE ${GRIDIRON_SOURCES})
-target_sources(gridiron-static INTERFACE ${GRIDIRON_SOURCES})
-target_sources(gridiron-shared INTERFACE ${GRIDIRON_SOURCES})
+target_sources(gridiron-object PUBLIC ${GRIDIRON_SOURCES})
+target_sources(gridiron-static PUBLIC ${GRIDIRON_SOURCES})
+target_sources(gridiron-shared PUBLIC ${GRIDIRON_SOURCES})
+target_include_directories(gridiron-object PUBLIC "${GRIDIRON_INCLUDE_ROOT}/../")
+target_include_directories(gridiron-static PUBLIC "${GRIDIRON_INCLUDE_ROOT}/../")
+target_include_directories(gridiron-shared PUBLIC "${GRIDIRON_INCLUDE_ROOT}/../")
+
+add_dependencies(gridiron-object htmlcxx2)
+target_link_libraries(gridiron-object PUBLIC htmlcxx2)
+target_link_libraries(gridiron-static PUBLIC htmlcxx2)
+target_link_libraries(gridiron-shared PUBLIC htmlcxx2)
+
 set_target_properties(gridiron-object PROPERTIES
     VERSION ${GRIDIRON_VERSION}
     SOVERSION ${GRIDIRON_VERSION_MAJOR}
@@ -44,6 +53,3 @@ set_target_properties(gridiron-shared PROPERTIES
 target_compile_definitions(gridiron-object ${GRIDIRON_COMPILE_DEFS})
 target_compile_definitions(gridiron-static ${GRIDIRON_COMPILE_DEFS})
 target_compile_definitions(gridiron-shared ${GRIDIRON_COMPILE_DEFS})
-target_include_directories(gridiron-object PRIVATE "${GRIDIRON_INCLUDE_ROOT}/../" "${HTMLCXX2_INCLUDE_ROOT}")
-target_include_directories(gridiron-static PRIVATE "${GRIDIRON_INCLUDE_ROOT}/../" "${HTMLCXX2_INCLUDE_ROOT}")
-target_include_directories(gridiron-shared PRIVATE "${GRIDIRON_INCLUDE_ROOT}/../" "${HTMLCXX2_INCLUDE_ROOT}")
