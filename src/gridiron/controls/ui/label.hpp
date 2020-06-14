@@ -47,11 +47,12 @@ namespace GridIron {
             ROProperty<bool> Autonomous = false;
 
         private:
+            // TODO: this whole approach is stuck inbetween. Need a Property/Attribute map class?
             bool _defaulttext;
-            RWProperty<std::string> Text;
-            RWProperty<std::string> Style;
-            RWProperty<int> Height;
-            RWProperty<int> Width;
+            RWProperty<std::string> text; // really needs to get the node's contents?
+            AttributeMappedProperty<std::string> style;
+            AttributeMappedProperty<int> height;
+            AttributeMappedProperty<int> width;
 
             // TODO: expand to handle most/all properties and deal with the overlap
             // between the properties and parsing the style argument.

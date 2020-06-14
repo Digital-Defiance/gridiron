@@ -203,34 +203,6 @@ namespace GridIron {
     }
 #endif
 
-    /**
-     * Expose the protected addAttribute, returns whether call succeeded
-     * @param key
-     * @param value
-     * @return
-     */
-    inline bool Control::addAttribute(const std::string &key, const std::string &value) {
-        if (this->hasAttribute(key)) {
-            return false;
-        }
-        // call parent
-        htmlcxx2::HTML::Node::addAttribute(key, value);
-        return true;
-    }
-
-    inline bool Control::updateAttribute(const std::string &key, std::string &value) {
-        for (size_t i = 0, l = attributeKeys_.size(); i < l; ++i)
-        {
-            if (htmlcxx2::HTML::impl::icompare(attributeKeys_[i].c_str(), key.c_str()) == 0)
-            {
-                attributeValues_[i] = value;
-                return true;
-            }
-        }
-        // not found, try to add
-        return addAttribute(key, value);
-    }
-
     // ------------------------------------------------
     // The following are used to allow us to instantiate control classes by type name as autonomous controls
     // Derived from Dr. Dobbs http://www.ddj.com/184410633

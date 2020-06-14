@@ -5,6 +5,8 @@
 #ifndef GRIDIRON_PROPERTY_H
 #define GRIDIRON_PROPERTY_H
 
+#include <gridiron/node.hpp>
+
 namespace GridIron {
     template <class T>
     class BaseProperty {
@@ -114,6 +116,60 @@ namespace GridIron {
         // specializations for appropriate types might choose to
         // add combined operators like +=, etc.
         inline operator T() const {
+            return data;
+        }
+
+        typedef T value_type; // might be useful for template deductions
+    };
+
+    template <class T>
+    class AttributeMappedProperty : BaseProperty<T> {
+    protected:
+        const GridIron::Node node_;
+        T data;
+    public:
+        // access with function call syntax
+        AttributeMappedProperty(T attribute, GridIron::Node &node) : data{attribute}, node_{node} {}
+
+        inline T operator()() const {
+            return this->get();
+        }
+
+        inline T operator()(T const &value) {
+            node_.updateAttribute(data, value);
+            return data;
+        }
+
+        friend inline std::ostream &operator<<(std::ostream &os, AttributeMappedProperty &property) {
+            os << property.get();
+            return os;
+        }
+
+        // access with get()/set() syntax
+        inline T get() const {
+            if (node_.hasAttribute(data)) {
+                T value;
+                node_.attribute(data, value);
+                return value;
+            }
+            return T();
+        }
+
+        inline T set(T const &value) {
+            node_.updateAttribute(data, value);
+            return data;
+        }
+
+        // access with '=' sign
+        // in an industrial-strength library,
+        // specializations for appropriate types might choose to
+        // add combined operators like +=, etc.
+        inline operator T() const {
+            return get();
+        }
+
+        inline T operator=(T const &value) {
+            node_.updateAttribute(data, value);
             return data;
         }
 

@@ -27,6 +27,7 @@
 // htmlcxx
 #include <htmlcxx2/src/htmlcxx2/kp_tree.hh>
 #include <htmlcxx2/src/htmlcxx2/htmlcxx2_html.hpp>
+#include <gridiron/node.hpp>
 
 #ifndef GRIDIRON_XHTML_NS
 #error "Please add -DGRIDIRON_XHTML_NS=gi"

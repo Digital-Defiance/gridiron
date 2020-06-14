@@ -42,7 +42,7 @@ namespace GridIron {
     class Page;
 
     // custom control base class, must derive
-    class Control : public htmlcxx2::HTML::Node, public std::enable_shared_from_this<Control> {
+class Control : public GridIron::Node, public std::enable_shared_from_this<Control> {
     protected:
         Control(const char *id, std::shared_ptr<Control> parent);                // parent can be page type or control type
     public:
@@ -88,13 +88,6 @@ namespace GridIron {
         }
 
 //        static std::shared_ptr<Control> fromHtmlNode(htmlcxx2::HTML::Node &node);
-
-        // change signature to expose protected variant
-        inline bool addAttribute(const std::string &key, const std::string &value = "");
-
-        inline bool attribute(const std::string &key, std::string &value) const;
-
-        inline bool updateAttribute(const std::string &key, std::string &value);
 
     protected:
         virtual bool
