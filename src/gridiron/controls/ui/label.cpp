@@ -33,8 +33,10 @@ namespace GridIron {
         originalText{this->text()},
         style{"", (*this)},
         height{-1, (*this)},
-        width{-1, (*this)}
+        width{-1, (*this)},
+        Changed{originalText, this->text()} // watcher property
     {
+        // ensure the text is not copied now, only when accessed
         parent->GetPage()->RegisterROVariable(ID.get().append(".Text"), this->Text.ROPointer());
     }
 

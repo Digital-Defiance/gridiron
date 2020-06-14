@@ -46,6 +46,7 @@ namespace GridIron {
             ROProperty<bool> AllowAutonomous = true;
             ROProperty<bool> Autonomous = false;
             ROIndirectProperty<std::string> Text;
+            CompareProperty<std::string> Changed;
             AttributeMappedProperty<std::string> style;
             AttributeMappedProperty<int> height;
             AttributeMappedProperty<int> width;

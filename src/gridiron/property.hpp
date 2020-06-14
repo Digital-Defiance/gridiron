@@ -126,7 +126,6 @@ namespace GridIron {
         typedef T value_type; // might be useful for template deductions
     };
 
-    // a read-only property calling a user-defined getter
     template <class T>
     class ROIndirectProperty {
         std::shared_ptr<const T> const data ;
@@ -163,7 +162,38 @@ namespace GridIron {
             return data->get();
         }
 
-        typedef T value_type;  // might be useful for template deductions };
+        typedef T value_type;  // might be useful for template deductions
+    };
+
+    template <class T, class U = T>
+    class CompareProperty {
+        std::shared_ptr<const T> const originalData ;
+        std::shared_ptr<const T> const comparedData ;
+    public:
+        explicit CompareProperty(const T &originalData, const U &comparedData) :
+            originalData{std::shared_ptr<const T>(&originalData)},
+            comparedData{std::shared_ptr<const T>(&comparedData)}
+        {}
+
+        // function call syntax
+        bool operator()() const
+        {
+            return (originalData.get() == comparedData.get());
+        }
+        // get/set syntax
+        bool get() const
+        {
+            return (originalData.get() == comparedData.get());
+        }
+        void set( T const & value ); // reserved but not implemented, per C++/CLI
+
+        // use on rhs of '='
+        operator bool() const
+        {
+            return (originalData.get() == comparedData.get());
+        }
+
+        typedef T value_type;  // might be useful for template deductions
     };
 
     template <class T>
