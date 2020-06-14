@@ -60,8 +60,8 @@ namespace GridIron {
         HtmlFilepath = ROProperty<std::string>(fullPagePath);
 
         // add/link default registered variables
-        _regvars.insert({std::string(GRIDIRON_XHTML_NS).append(".frontPage"), std::shared_ptr<std::string>(_htmlFilepath)});
-        _regvars.insert({std::string(GRIDIRON_XHTML_NS).append(".codeBesideFilename"), &_htmlFile});
+        _regvarsRW.insert({std::string(GRIDIRON_XHTML_NS).append(".frontPage"), std::shared_ptr<std::string>(_htmlFilepath)});
+        _regvarsRW.insert({std::string(GRIDIRON_XHTML_NS).append(".codeBesideFilename"), &_htmlFile});
 
         // we sort of have a problem here. _namespace is constant. We don't want it to change
         // but we can't make the right hand side of the  map constant
@@ -69,7 +69,7 @@ namespace GridIron {
         // do we need to change the type of the right hand side to handle constant and non constant
         // types with some sort of wrapper class?
 
-        _regvars[".namespace"] = std::string(this->Namespace);
+        _regvarsRW[".namespace"] = std::string(this->Namespace);
 
         // allocate mem
         std::string buffer;
@@ -269,7 +269,7 @@ namespace GridIron {
 
     // for controls to make variables available for HTML replacement. alphanumeric and _ only.
     bool
-    Page::RegisterVariable(const std::string name, std::shared_ptr<std::string> data) {
+    Page::RegisterRWVariable(const std::string name, std::shared_ptr<std::string> data) {
         // NOTE: tags starting with __ should be system generated vars only, but we won't check
 
         // make sure name has a length
@@ -280,12 +280,33 @@ namespace GridIron {
         if (pos != std::string::npos) return false;
 
         // search through variables, make sure name isn't already registered
-        for (std::map<const std::string, RWProperty<std::shared_ptr<std::string>>>::iterator m = _regvars.begin(); m != _regvars.end(); ++m) {
+        for (std::map<const std::string, RWProperty<std::shared_ptr<std::string>>>::iterator m = _regvarsRW.begin(); m != _regvarsRW.end(); ++m) {
             if (m->first == name) return false;
         }
 
         // no existing var with same name found, register it
-        _regvars[name] = data;
+        _regvarsRW[name] = data;
+        return true;
+    }
+
+    bool
+    RegisterROVariable(const std::string name, std::shared_ptr<const std::string> const data) {
+        // NOTE: tags starting with __ should be system generated vars only, but we won't check
+
+        // make sure name has a length
+        if (name.length() == 0) return false;
+
+        // validate name characters
+        int pos = name.find_first_not_of("_-abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789."); // allow dots
+        if (pos != std::string::npos) return false;
+
+        // search through variables, make sure name isn't already registered
+        for (std::map<const std::string, ROProperty<std::shared_ptr<const std::string>>>::iterator m = _regvarsRO.begin(); m != _regvarsRO.end(); ++m) {
+            if (m->first == name) return false;
+        }
+
+        // no existing var with same name found, register it
+        _regvarsRO[name] = data;
         return true;
     }
 }

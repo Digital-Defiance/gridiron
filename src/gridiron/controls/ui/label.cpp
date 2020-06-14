@@ -27,13 +27,15 @@
 namespace GridIron {
     using namespace GridIron::controls;
 
-    Label::Label(const char *id, std::shared_ptr<Control> parent, const std::string text) : Control(id, parent),
+    Label::Label(const char *id, std::shared_ptr<Control> parent) : Control(id, parent),
         This{shared_from_this()},
-        Text{text}
+        Text{this->text()},
+        originalText{this->text()},
+        style{"", (*this)},
+        height{-1, (*this)},
+        width{-1, (*this)}
     {
-        // copy text
-        _defaulttext = true;
-        parent->GetPage()->RegisterVariable(ID.get().append(".Text"), this->Text.get());
+        parent->GetPage()->RegisterROVariable(ID.get().append(".Text"), this->Text.ROPointer());
     }
 
 #if FALSE

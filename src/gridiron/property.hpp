@@ -104,6 +104,10 @@ namespace GridIron {
             return os;
         }
 
+        inline const T* getPointerRO() const {
+            return &data;
+        }
+
         // access with get()/set() syntax
         inline T get() const {
             return data;
@@ -122,21 +126,80 @@ namespace GridIron {
         typedef T value_type; // might be useful for template deductions
     };
 
+    // a read-only property calling a user-defined getter
+    template <class T>
+    class ROIndirectProperty {
+        std::shared_ptr<const T> const data ;
+    public:
+        explicit ROIndirectProperty(const T &data) : data{std::shared_ptr<const T>(&data)} {}
+
+        inline std::shared_ptr<const T> ROPointer() const {
+            return std::shared_ptr<const T>(data);
+        }
+
+        // this function must be called by the containing class, normally in a
+        // constructor, to initialize the ROProperty so it knows where its
+        // real implementation code can be found. obj is usually the containing
+        // class, but need not be; it could be a special implementation object.
+        void operator () ( std::shared_ptr<const T> t )
+        {
+            data = t;
+        }
+        // function call syntax
+        T operator()() const
+        {
+            return data->get();
+        }
+        // get/set syntax
+        T get() const
+        {
+            return data->get();
+        }
+        void set( T const & value ); // reserved but not implemented, per C++/CLI
+
+        // use on rhs of '='
+        operator T() const
+        {
+            return data->get();
+        }
+
+        typedef T value_type;  // might be useful for template deductions };
+    };
+
     template <class T>
     class AttributeMappedProperty : BaseProperty<T> {
     protected:
         const GridIron::Node node_;
+        bool changed_ = false;
+        T original;
         T data;
     public:
         // access with function call syntax
-        AttributeMappedProperty(T attribute, GridIron::Node &node) : data{attribute}, node_{node} {}
+        AttributeMappedProperty(T attributeData, GridIron::Node &node) : data{attributeData}, node_{node} {
+            // locate the original attribute value and source the value
+            if (node.hasAttribute(std::to_string(attributeData))) {
+                std::string value;
+                node.attribute(std::to_string(attributeData), value);
+                this->original = value;
+                this->changed_ = (this->original != this->data);
+            } else {
+                this->original = this->data;
+                this->changed_ = false;
+            }
+        }
+        AttributeMappedProperty(AttributeMappedProperty &property) {
+            this->node_ = property.node_;
+            this->original = property.original;
+            this->data = property.data;
+            this->changed_ = false;
+        }
 
         inline T operator()() const {
             return this->get();
         }
 
         inline T operator()(T const &value) {
-            node_.updateAttribute(data, value);
+            node_.updateAttribute(std::to_string(data), value);
             return data;
         }
 
@@ -147,16 +210,16 @@ namespace GridIron {
 
         // access with get()/set() syntax
         inline T get() const {
-            if (node_.hasAttribute(data)) {
+            if (node_.hasAttribute(std::to_string(data))) {
                 T value;
-                node_.attribute(data, value);
+                node_.attribute(std::to_string(data), value);
                 return value;
             }
             return T();
         }
 
         inline T set(T const &value) {
-            node_.updateAttribute(data, value);
+            node_.updateAttribute(std::to_string(data), value);
             return data;
         }
 
@@ -169,7 +232,7 @@ namespace GridIron {
         }
 
         inline T operator=(T const &value) {
-            node_.updateAttribute(data, value);
+            node_.updateAttribute(std::to_string(data), value);
             return data;
         }
 

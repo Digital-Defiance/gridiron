@@ -38,27 +38,28 @@ namespace GridIron {
 
         class Label : public Control {
         public:
-            Label(const char *id, std::shared_ptr<Control> parent, std::string text = "");
+            Label(const char *id, std::shared_ptr<Control> parent);
             ROProperty<std::shared_ptr<Control>, std::shared_ptr<Label>> This;
             ROProperty<ControlPass> Pass = ControlPass::FIRST;         // which pass the control is expected to be rendered on
             ROProperty<const char *> Namespace = GRIDIRON_XHTML_NS;         // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
             ROProperty<const char *> RenderTag = "div";    // the associated codebeside tag name eg <namespace>::<tag>
             ROProperty<bool> AllowAutonomous = true;
             ROProperty<bool> Autonomous = false;
-
-        private:
-            // TODO: this whole approach is stuck inbetween. Need a Property/Attribute map class?
-            bool _defaulttext;
-            RWProperty<std::string> text; // really needs to get the node's contents?
+            ROIndirectProperty<std::string> Text;
             AttributeMappedProperty<std::string> style;
             AttributeMappedProperty<int> height;
             AttributeMappedProperty<int> width;
+
+        protected:
+            // TODO: this whole approach is stuck inbetween. Need a Property/Attribute map class?
+            std::string originalText;
 
             // TODO: expand to handle most/all properties and deal with the overlap
             // between the properties and parsing the style argument.
             // e.g. setting height should add a style="height: Npx;"
             // but the template Tag may have a style="height: 14px;" - in which case, we have a conflict
             // the label should get the template values at instantiation, and allow to be changed before render
+        protected:
         };
     }
 }

@@ -61,7 +61,20 @@ namespace GridIron {
         friend std::ostream &operator<<(std::ostream &os, const Control &control);
 
         bool
-        RegisterVariable(const std::string name, std::shared_ptr<std::string> data);    // register a variable for front-page access
+        RegisterRWVariable(const std::string name, std::shared_ptr<std::string> data);    // register a variable for front-page access
+        bool
+        RegisterROVariable(const std::string name, std::shared_ptr<const std::string> const data);    // register a variable for front-page access
+
+        // make simpler syntax available
+        inline bool
+        RegisterVariable(const std::string name, std::shared_ptr<std::string> data) {
+            return RegisterRWVariable(name, data);
+        }
+        inline bool
+        RegisterVariable(const std::string name, std::shared_ptr<const std::string> const data) {
+            return RegisterROVariable(name, data);
+        }
+
 
         static const std::string PathToFile(const std::string file);
 
@@ -75,7 +88,8 @@ namespace GridIron {
 
     protected:
         kp::tree<htmlcxx2::HTML::Node> _tree;        // html tree
-        std::map<const std::string, RWProperty<std::shared_ptr<std::string>>> _regvars;            // registered variables for frontpage access
+        std::map<const std::string, RWProperty<std::shared_ptr<std::string>>> _regvarsRW;            // registered variables for frontpage access
+        std::map<const std::string, ROProperty<std::shared_ptr<const std::string>>> _regvarsRO;
         std::map<const htmlcxx2::HTML::Node *, std::shared_ptr<GridIron::Control>> _nodemap;            // registered nodes
     };
 }
