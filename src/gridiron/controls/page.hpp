@@ -36,6 +36,7 @@
 #include <vector>
 
 // local
+#define GRIDIRON_NESTED_EXCLUDE_PAGE
 #include <gridiron/gridiron.hpp>
 
 namespace GridIron {

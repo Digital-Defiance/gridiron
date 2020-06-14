@@ -1,4 +1,4 @@
-#include <gridiron/gridiron.hpp>
+#include <gridiron/controls/value.hpp>
 
 namespace GridIron {
     Value::Value(std::shared_ptr<Control> parent, std::string key, std::string value) :

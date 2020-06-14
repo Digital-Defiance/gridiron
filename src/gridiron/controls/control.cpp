@@ -48,12 +48,12 @@ namespace GridIron {
 
             // register ourselves with the parent if we have one (pages dont)
             // parent will have a pointer to our id string to save mem and allow for changes
-            if (Parent != nullptr) Parent.registerChild(_id, this);
+            if (Parent.get() != nullptr) Parent.get()->registerChild(ID.get(), This);
         }
     }
 
-    friend std::ostream& operator<<(std::ostream& os, const Control& control) {
-        os << control.HtmlNode();
+    std::ostream& operator<<(std::ostream& os, const Control& control) {
+        os << control;
         return os;
     }
 
@@ -63,8 +63,8 @@ namespace GridIron {
     Control::GetRoot(void) {
         std::shared_ptr<Control> ptr = This;
 
-        while (ptr->_parent != nullptr) {
-            ptr = ptr->_parent->This;
+        while (ptr->Parent.get() != nullptr) {
+            ptr = ptr->Parent.get();
         }
 
         return ptr;
@@ -77,7 +77,7 @@ namespace GridIron {
         std::shared_ptr<Control> ptr = GetRoot();
         if (Page::instanceOf<Page>(ptr)) {
             Page *p = dynamic_cast<Page *>(ptr.get());
-            return p->This;
+            return std::static_pointer_cast<Page>(p->This.get());
         }
         return nullptr;
     }

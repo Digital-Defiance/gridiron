@@ -24,7 +24,8 @@
  ***************************************************************************************/
 
 #include <fmt/include/fmt/printf.h>
-#include <gridiron/gridiron.hpp>
+
+#include <gridiron/controls/page.hpp>
 
 namespace GridIron {
     Page::Page(const char *codeBesideFilename) : Control(codeBesideFilename, NULL),

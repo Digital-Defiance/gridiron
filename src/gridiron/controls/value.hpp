@@ -1,6 +1,7 @@
 #ifndef GRIDIRON_VALUE_HPP
 #define GRIDIRON_VALUE_HPP
 
+#define GRIDIRON_NESTED_EXCLUDE_VALUE
 #include <gridiron/gridiron.hpp>
 
 namespace GridIron {

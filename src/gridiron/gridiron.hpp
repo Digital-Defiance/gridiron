@@ -60,11 +60,15 @@ namespace GridIron {
     };
 }
 
-// Include the rest of gridiron's most primitive values
 #include <gridiron/exceptions.hpp>
 #include <gridiron/property.hpp>
 #include <gridiron/controls/control.hpp>
+#if !defined GRIDIRON_NESTED_EXCLUDE_VALUE
 #include <gridiron/controls/value.hpp>
+#endif
+#if !defined GRIDIRON_NESTED_EXCLUDE_PAGE
 #include <gridiron/controls/page.hpp>
+#endif
+// Include the rest of gridiron's most primitive values
 
 #endif

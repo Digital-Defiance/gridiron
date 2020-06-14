@@ -39,7 +39,7 @@ namespace GridIron {
     public:
         // access with function call syntax
         RWProperty() : data() {}
-        RWProperty(T &data) : data{reinterpret_cast<U>(data)} {}
+        RWProperty(T &data, bool reinterpret) : data{reinterpret_cast<U>(data)} {}
         RWProperty(T b) : data{b} {}
 
         inline T operator()() const {
@@ -90,7 +90,7 @@ namespace GridIron {
     public:
         // access with function call syntax
         ROProperty() : data() {};
-        ROProperty(T &data) : data{reinterpret_cast<U>(data)} {}
+        ROProperty(T &data, bool reinterpret) : data{reinterpret_cast<U>(data)} {} // disambiguate
         ROProperty(T b) : data{b} {}
 
         inline T operator()() const {
