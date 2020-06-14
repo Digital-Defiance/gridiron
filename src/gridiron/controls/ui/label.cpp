@@ -27,18 +27,16 @@
 namespace GridIron {
     using namespace GridIron::controls;
 
-    Label::Label(const char *id, std::shared_ptr<Control> parent, std::string text) : Control(id, parent) :
-        Namespace{GRIDIRON_XHTML_NS},
-        tagName_{GRIDIRON_XHTML_NS + "::Label"},
-        RenderTag{"div"}
+    Label::Label(const char *id, std::shared_ptr<Control> parent, const std::string text) : Control(id, parent),
+        This{shared_from_this()},
+        Text{text}
     {
         // copy text
-        _text = std::string(text);
-        _defaulttext = text.empty();
-        parent->GetPage().RegisterVariable(_id.append(".Text"), lblTest.GetTextPtr());
+        _defaulttext = true;
+        parent->GetPage()->RegisterVariable(ID.get().append(".Text"), this->Text.get());
     }
 
-    static
+#if FALSE
     std::shared_ptr<Label>
     Label::fromHtmlNode(htmlcxx2::HTML::Node &node) {
         std::shared_ptr<Page> _Page = GetPage();
@@ -62,17 +60,7 @@ namespace GridIron {
         // otherwise client will have to manually register if they want it accessible
         if (_autonomous) _Page->RegisterVariable(_id + ".Text", &_text);
     }
-
-
-    friend std::ostream& operator<<(std::ostream& os, Label& label) {
-        label.parse();
-        htmlcxx2::HTML::Node n;
-        // TODO: use namespace::tagname, render out all the HTML attributes
-        const char* foo = "<div style=\"align: left;\">" + label. _text.c_str() + "</div>";
-    //    return oatpp::String(foo);
-
-        return os;
-    }
+#endif
 
     ////////////////////////////////////////////////////////////
     // Declare an instance of the proxy to register the

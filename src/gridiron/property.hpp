@@ -23,13 +23,13 @@ namespace GridIron {
 
         virtual inline operator T() const = 0;
 
-        virtual inline T operator=(T const &value);
+        virtual T operator=(T const &value);
 
         typedef T value_type; // might be useful for template deductions
     };
 
 
-    template <class T>
+    template <class T, class U = T>
     class RWProperty : BaseProperty<T> {
     protected:
         T data;
@@ -37,6 +37,8 @@ namespace GridIron {
     public:
         // access with function call syntax
         RWProperty() : data() {}
+        RWProperty(T &data) : data{reinterpret_cast<U>(data)} {}
+        RWProperty(T b) : data{b} {}
 
         inline T operator()() const {
             return data;
@@ -78,23 +80,22 @@ namespace GridIron {
         typedef T value_type; // might be useful for template deductions
     };
 
-    template <class T>
+    template <class T, class U = T>
     class ROProperty : BaseProperty<T> {
     protected:
         T data;
 
     public:
         // access with function call syntax
-        ROProperty(T data) : data() {}
+        ROProperty() : data() {};
+        ROProperty(T &data) : data{reinterpret_cast<U>(data)} {}
+        ROProperty(T b) : data{b} {}
 
         inline T operator()() const {
             return data;
         }
 
-        inline T operator()(T const &value) {
-            data = value;
-            return data;
-        }
+        T operator()(T const &value);
 
         friend inline std::ostream &operator<<(std::ostream &os, ROProperty &property) {
             os << property.get();
@@ -106,7 +107,7 @@ namespace GridIron {
             return data;
         }
 
-        inline T set(T const &value); // reserved, but not implemented
+        T set(T const &value); // reserved, but not implemented
 
         // access with '=' sign
         // in an industrial-strength library,

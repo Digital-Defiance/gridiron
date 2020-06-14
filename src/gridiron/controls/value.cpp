@@ -1,12 +1,18 @@
-#include <gridiron/controls/value.hpp>
+#include <gridiron/gridiron.hpp>
 
 namespace GridIron {
-    static ROProperty<std::string> Value::Namespace = GRIDIRON_XHTML_NS;
-    static ROProperty<std::string> Value::Tag = "Value";
+    Value::Value(std::shared_ptr<Control> parent, std::string key, std::string value) :
+        Control(std::string("value-").append(key).c_str(), parent),
+        This{shared_from_this()},
+        key{key},
+        value{value}
+    {
+        this->tagName_ = std::string(GRIDIRON_XHTML_NS).append("::Value");
+    }
 
-    Value::Value(std::shared_ptr<Control> parent, std::string key, std::string value = "") :
-        This{std::shared_from_this()},
-        tagName_{"div"},
-        _key{key},
-        value{value} {}
+    ////////////////////////////////////////////////////////////
+    // Declare an instance of the proxy to register the
+    // existence of Label with the ControlFactory
+    // !! only do this for classes that support autos !!
+    static GridIron::ControlFactoryProxy<GridIron::Value> globaValueProxy;
 }

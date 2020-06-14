@@ -14,7 +14,6 @@
  ***************************************************************************************/
 
 #include <gridiron/gridiron.hpp>
-#include <gridiron/exceptions.hpp>
 
 namespace GridIron {
     // parse control type out of Tag

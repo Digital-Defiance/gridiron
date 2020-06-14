@@ -14,7 +14,9 @@ add_subdirectory(html)
 add_library(gridiron-object OBJECT ${GRIDIRON_SOURCES})
 add_library(gridiron-static STATIC $<TARGET_OBJECTS:gridiron-object>)
 add_library(gridiron-shared SHARED $<TARGET_OBJECTS:gridiron-object>)
-
+target_sources(gridiron-object INTERFACE ${GRIDIRON_SOURCES})
+target_sources(gridiron-static INTERFACE ${GRIDIRON_SOURCES})
+target_sources(gridiron-shared INTERFACE ${GRIDIRON_SOURCES})
 set_target_properties(gridiron-object PROPERTIES
     VERSION ${GRIDIRON_VERSION}
     SOVERSION ${GRIDIRON_VERSION_MAJOR}

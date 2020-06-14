@@ -23,27 +23,25 @@
  * supplied by a Page class's parsing operation.
  ***************************************************************************************/
 
-#include <gridiron/controls/page.hpp>
+#include <fmt/include/fmt/printf.h>
+#include <gridiron/gridiron.hpp>
 
- namespace GridIron {
-    Page::Page(std::string codeBesideFilename) : Control(codeBesideFilename, NULL) :
-        This{std::shared_from_this()},
-        Namespace{GRIDIRON_XHTML_NS},
-        tagName_{GRIDIRON_XHTML_NS + "::Page"},
-        RenderTag{"html"}
+namespace GridIron {
+    Page::Page(const char *codeBesideFilename) : Control(codeBesideFilename, NULL),
+        Status{PageStatus::INITIALIZING},
+        This{shared_from_this()}
     {
-        int filesize = 0;
+        this->tagName_ = std::string(GRIDIRON_XHTML_NS).append("::Page");
         int bytesread = 0;
         int i = 0;
 
-        // save name for access
-        if (!codeBesideFilename.empty()) _htmlFile = codeBesideFilename;
-        else _htmlFile = std::string("::memory:" + addressof(this));
+        HtmlFile = std::string(codeBesideFilename);
+        if (HtmlFile.get().empty()) {
+            throw new std::invalid_argument("HtmlFile cannot be empty");
+        }
 
         // make up an id until we parse and match up with one
-        _id = std::string(Namespace + "::Page::" + _htmlFile);    // default id = "_Page_" or "_Page_foobar.html"
-        _viewStateEnabled = false;            // whether to output the viewstate
-        _autonomous = Page::AllowAutonomous();        // not applicable, page classes cannot be autonomous
+        ID = ROProperty<std::string>(std::string(Namespace).append("::Page::").append(HtmlFile));    // default id = "_Page_" or "_Page_foobar.html"
 
         if (codeBesideFilename.empty()) {
             // if no front-page is given, the caller will have to render everything themselves
@@ -51,12 +49,27 @@
             return;
         }
 
+        // update status with another new property/RO status( does it work? )
+        this->Status = ROProperty<PageStatus>(PageStatus::INIT_READING);
+
         // open the front-page
-        const std::string fullPagePath = GridIron::pathToPage(frontPage);
+        const std::string fullPagePath = PathToFile(codeBesideFilename);
         std::ifstream ifs(fullPagePath, std::ios_base::in);
         if (!ifs.is_open()) throw GridException(101, std::string("unable to open front-end page: ").append(
                     fullPagePath).c_str());
-        _htmlFilepath = fullPagePath;
+        HtmlFilepath = ROProperty<std::string>(fullPagePath);
+
+        // add/link default registered variables
+        _regvars.insert({std::string(GRIDIRON_XHTML_NS).append(".frontPage"), std::shared_ptr<std::string>(_htmlFilepath)});
+        _regvars.insert({std::string(GRIDIRON_XHTML_NS).append(".codeBesideFilename"), &_htmlFile});
+
+        // we sort of have a problem here. _namespace is constant. We don't want it to change
+        // but we can't make the right hand side of the  map constant
+        // arguably _htmlFile should be a constant too.
+        // do we need to change the type of the right hand side to handle constant and non constant
+        // types with some sort of wrapper class?
+
+        _regvars[".namespace"] = std::string(this->Namespace);
 
         // allocate mem
         std::string buffer;
@@ -71,34 +84,28 @@
         // close the file
         file.close();
 
+        // update status with another new property/RO status( does it work? )
+        this->Status = ROProperty<PageStatus>(PageStatus::INIT_PARSING);
+
         if (bytesread == 0) {
             throw GridException(103, "front-end file is empty");
         }
-        filesize = bytesread;
 
-        ParserDom parser;
+        htmlcxx2::HTML::ParserDom parser;
         _tree = parser.parseTree(buffer);
+        delete buffer;
 
-        // add/link default registered variables
-        _regvars[GRIDIRON_XHTML_NS + ".frontPage"] = &_htmlFilepath;
-        _regvars[GRIDIRON_XHTML_NS + ".codeBesideFilename"] = &_htmlFile;
-
-        // we sort of have a problem here. _namespace is constant. We don't want it to change
-        // but we can't make the right hand side of the  map constant
-        // arguably _htmlFile should be a constant too.
-        // do we need to change the type of the right hand side to handle constant and non constant
-        // types with some sort of wrapper class?
-
-        _regvars[".namespace"] = std::string(GRIDIRON_XHTML_NS).c_str();
+        // update status with another new property/RO status( does it work? )
+        this->Status = ROProperty<PageStatus>(PageStatus::PARSED_READY);
     }
 
-    std::string Page::pathToPage(std::string frontPage) {
+    const std::string Page::PathToFile(const std::string file) {
         std::filesystem::path basePath = std::filesystem::current_path();
-        return basePath.append(GRIDIRON_HTML_DOCROOT).append(frontPage);
+        return basePath.append(GRIDIRON_HTML_DOCROOT).append(file);
     }
 
-    std::string Page::pathToPage() {
-        return this;
+    const std::string Page::PathToPage() {
+        return PathToFile(this->_htmlFilepath);
     }
 
     // TODO: all the std::cerr's are either debug printing or need to be converted to throws
@@ -108,7 +115,7 @@
     // Parsing happens in two passes- one automatically at instantiation of the page that searches for autos
     // and the second when render is called.
     // if the tree object has already been filled in, we know this is the second (or later) pass
-    static
+#if FALSE
     std::shared_ptr<Page>
     Page::fromHtmlNode(htmlcxx2::HTML::Node &node) {
         int controlcount = 0;            // how many custom controls we find
@@ -199,7 +206,7 @@
 
                                 // try to create a control of this type. The control class must be registered with the factory.
                                 // only classes that support autos should register.
-                                instance = globalControlFactory.CreateByType(tagType.c_str(), idresult.second.c_str(), This());
+                                instance = globalControlFactory.CreateByType(tagType.c_str(), idresult.second.c_str(), This);
 
                                 //If we get an instance, it worked, if it didn't tough luck.
                                 if (instance == NULL) {
@@ -258,10 +265,11 @@
             ++sib; // next!
         }
     }
+#endif
 
     // for controls to make variables available for HTML replacement. alphanumeric and _ only.
     bool
-    Page::RegisterVariable(const std::string name, std::string *data) {
+    Page::RegisterVariable(const std::string name, std::shared_ptr<std::string> data) {
         // NOTE: tags starting with __ should be system generated vars only, but we won't check
 
         // make sure name has a length
@@ -272,7 +280,7 @@
         if (pos != std::string::npos) return false;
 
         // search through variables, make sure name isn't already registered
-        for (std::map<const std::string, std::string *>::iterator m = _regvars.begin(); m != _regvars.end(); ++m) {
+        for (std::map<const std::string, RWProperty<std::shared_ptr<std::string>>>::iterator m = _regvars.begin(); m != _regvars.end(); ++m) {
             if (m->first == name) return false;
         }
 

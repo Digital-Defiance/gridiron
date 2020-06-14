@@ -28,8 +28,6 @@
 #include <fstream>
 
 #include <gridiron/gridiron.hpp>
-#include <gridiron/controls/ui/label.hpp>
-
 
 namespace GridIron {
     class Control;
@@ -41,31 +39,19 @@ namespace GridIron {
         class Label : public Control {
         public:
             Label(const char *id, std::shared_ptr<Control> parent, std::string text = "");
-
-            inline void Text(std::string value) {
-                _text = value;
-                _defaulttext = false;
-            };    // set the text and mark it as changed
-            inline std::string Text() { return _text; };
-
-            inline std::string *const GetTextPtr() { return &_text; };
-
-            inline void SetHeight(int value) { _height = value; };
-
-            inline int GetHeight() { return _height; };
-
-            inline void SetWidth(int value) { _width = value; };
-
-            inline int GetWidth() { return _width; };
-
-            inline static const bool AllowAutonomous() { return true; }
+            ROProperty<std::shared_ptr<Control>, std::shared_ptr<Label>> This;
+            ROProperty<ControlPass> Pass = ControlPass::FIRST;         // which pass the control is expected to be rendered on
+            ROProperty<const char *> Namespace = GRIDIRON_XHTML_NS;         // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
+            ROProperty<const char *> RenderTag = "div";    // the associated codebeside tag name eg <namespace>::<tag>
+            ROProperty<bool> AllowAutonomous = true;
+            ROProperty<bool> Autonomous = false;
 
         private:
             bool _defaulttext;
-            std::string _text;
-            std::string _style;
-            int _height;
-            int _width;
+            RWProperty<std::string> Text;
+            RWProperty<std::string> Style;
+            RWProperty<int> Height;
+            RWProperty<int> Width;
 
             // TODO: expand to handle most/all properties and deal with the overlap
             // between the properties and parsing the style argument.

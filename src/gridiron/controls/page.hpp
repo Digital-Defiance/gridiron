@@ -44,21 +44,28 @@ namespace GridIron {
     // page classes are derived from control classes. They must have no parent (NULL).
     class Page : public Control {
     public:
-        Page(std::string codeBesideFilename);
+        Page(const char *codeBesideFilename);
 
-        ROProperty<std::shared_ptr<Page>> This;
+        ROProperty<ControlPass> Pass = ControlPass::FIRST;         // which pass the control is expected to be rendered on
+        ROProperty<const char *> Namespace = GRIDIRON_XHTML_NS;         // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
+        ROProperty<const char *> RenderTag = "html";    // the associated codebeside tag name eg <namespace>::<tag>
+        ROProperty<bool> IsPage = true;
+        ROProperty<GridIron::PageStatus> Status;
+        ROProperty<std::shared_ptr<Control>, std::shared_ptr<Page>> This;
+        ROProperty<bool> AllowAutonomous = false; // can't have an autonomous page class
+        ROProperty<bool> ViewStateEnabled = ROProperty<bool>(false);    // whether to bother serializing this object
+        ROProperty<bool> ViewStateValid = ROProperty<bool>(false);      // whether viewstate was authenticated
+        ROProperty<std::string> HtmlFile;        // front page filename
+        ROProperty<std::string> HtmlFilepath;    // front page filename full path
 
         friend std::ostream &operator<<(std::ostream &os, const Control &control);
 
         bool
-        RegisterVariable(const std::string name, std::string *data);    // register a variable for front-page access
-        inline static const bool AllowAutonomous() { return false; }        // can't have an autonomous page class
+        RegisterVariable(const std::string name, std::shared_ptr<std::string> data);    // register a variable for front-page access
 
-        static const std::string PathToPage(std::string frontPage);
+        static const std::string PathToFile(const std::string file);
 
-        static const std::string PathToPage();
-
-        inline static const bool IsPage = true;
+        const std::string PathToPage();
 
         inline kp::tree<htmlcxx2::HTML::Node>* HtmlTree() {
             return &_tree;
@@ -68,11 +75,9 @@ namespace GridIron {
 
     protected:
         kp::tree<htmlcxx2::HTML::Node> _tree;        // html tree
-        std::map<const std::string, RWProperty<char *>> _regvars;            // registered variables for frontpage access
+        std::map<const std::string, RWProperty<std::shared_ptr<std::string>>> _regvars;            // registered variables for frontpage access
         std::map<const htmlcxx2::HTML::Node *, std::shared_ptr<GridIron::Control>> _nodemap;            // registered nodes
-        std::string _htmlFile;        // front page filename
-        std::string _htmlFilepath;        // front page filename full path
     };
 }
 
-#endif
+#endif // PAGE_HPP

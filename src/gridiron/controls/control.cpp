@@ -21,42 +21,34 @@
  * supplied by a Page class's parsing operation.
  ***************************************************************************************/
 
-#include <gridiron/controls/control.hpp>
+#include <gridiron/gridiron.hpp>
 
 namespace GridIron {
 
     Control::Control(const char *id, std::shared_ptr<Control> parent) :
-        This{std::shared_from_this()},
-        Namespace{GRIDIRON_XHTML_NS},
-        tagName_{GRIDIRON_XHTML_NS + "::Control"},
-        RenderTag{"div"}
+        This{shared_from_this()},
+        ID{id},
+        Parent{parent}
     {
-        std::shared_ptr<Control> result = nullptr;
+        this->tagName_ = std::string(GRIDIRON_XHTML_NS).append("::Control");
+        std::shared_ptr<Control> result = shared_from_this();
         std::shared_ptr<Page> _Page;
 
         // INITIALIZE VARIABLES
-        // our id
-        _id = std::string(id);
-        // our parent, as given
-        _parent = parent;
-        // whether this page should be serialized into the viewstate
-        _viewStateEnabled = false;
-        // whether this is an autonomous control - affects behavior in derived classes
-        _autonomous = false;
 
         // we must have an ID- and only one instance of an id may exist on all controls under a page object
-        if (_id.length() == 0) throw GridException(200, "no id specified");
+        if (ID.get().length() == 0) throw GridException(200, "no id specified");
 
         // find the page control if we have one, then look to see if the id is already registered
         _Page = GetPage();
         if (_Page != nullptr) {
             // check page for existing controls with that id
-            result = _Page->FindByID(_id, true);
+            result = _Page->FindByID(ID, true);
             if (result != nullptr) throw GridException(201, "id already in use");
 
             // register ourselves with the parent if we have one (pages dont)
             // parent will have a pointer to our id string to save mem and allow for changes
-            if (_parent != nullptr) _parent->registerChild(_id, this);
+            if (Parent != nullptr) Parent.registerChild(_id, this);
         }
     }
 
@@ -69,10 +61,10 @@ namespace GridIron {
     // returns: pointer - may be self
     std::shared_ptr<Control>
     Control::GetRoot(void) {
-        std::shared_ptr<Control> ptr = This();
+        std::shared_ptr<Control> ptr = This;
 
         while (ptr->_parent != nullptr) {
-            ptr = ptr->_parent->This();
+            ptr = ptr->_parent->This;
         }
 
         return ptr;
@@ -80,11 +72,12 @@ namespace GridIron {
 
     // fine the bottom-most control, only if a Page object
     // returns: pointer on success or nullptr, may be self
-    std::shared_ptr<Control>
+    std::shared_ptr<Page>
     Control::GetPage(void) {
         std::shared_ptr<Control> ptr = GetRoot();
-        if (ptr->instanceOf<Page>()) {
-            return static_cast<std::shared_ptr<Page>>(ptr);
+        if (Page::instanceOf<Page>(ptr)) {
+            Page *p = dynamic_cast<Page *>(ptr.get());
+            return p->This;
         }
         return nullptr;
     }
@@ -94,14 +87,14 @@ namespace GridIron {
         // check map
         std::map<Control*, std::shared_ptr<Control>>::iterator it = _controlsByControl.find(&control);
         if (it != _controlsByControl.end()) {
-            return it->first->This();
+            return it->first->This;
         }
         // not found, create a shared pointer
         std::shared_ptr<Control> spC = std::shared_ptr<Control> (&control);
         // add to map
         std::pair<std::map<Control*, std::shared_ptr<Control>>::iterator,bool> inserted = _controlsByControl.insert(std::make_pair(&control,std::move(spC)));
         // return the shared pointer
-        return inserted.first->first->This();
+        return inserted.first->first->This;
     }
 
     // recursive search through all controls under this object, return the one with specified id
@@ -113,8 +106,8 @@ namespace GridIron {
             // search immediate children first
             for (std::vector<std::shared_ptr<Control>>::iterator it = _children.begin(); it != _children.end(); ++it) {
                 // check the child's id first
-                if ((**it).ID() == id) {
-                    return (std::static_pointer_cast<std::shared_ptr<Control>>(*it));
+                if ((*it)->ID.get().compare(id) == 0) {
+                    return (*it)->This;
                 }
             }
         }
@@ -131,17 +124,17 @@ namespace GridIron {
     }
 
     std::ostream &Control::NamespacedTag(std::ostream &os) {
-        os << this->Namespace << "::" << this->Tag;
+        os << this->Namespace << "::" << this->RenderTag;
         return os;
     }
 
     std::string Control::NamespacedTag() {
-        return (this->Namespace + "::" + this->Tag)
+        return (std::string(this->Namespace).append("::").append(this->RenderTag));
     }
 
     // register this control with the parent
     bool
-    Control::registerChild(std::string id, Control *control) {
+    Control::registerChild(std::string id, std::shared_ptr<Control> control) {
         if (id.empty() || (control == nullptr)) return false;
 
         // check for duplicates first
@@ -151,8 +144,7 @@ namespace GridIron {
 
 
         // then add
-        std::shared_ptr<Control> spC = std::make_shared<Control>(control);
-        _children.push_back(new std::shared_ptr<Control>(control));
+        _children.push_back(control->This);
         std::cerr << "There are now " << _children.size() << " children registered." << std::endl;
 
         return true;
@@ -160,29 +152,31 @@ namespace GridIron {
 
     // unregister this control from the parent
     bool
-    Control::unregister_child(std::string &id) {
-        for (std::map<std::string, std::shared_ptr<Control>>::iterator i = _children.begin(), iend = _children.end(); i != iend; ++i) {
-            if (*(i->first) == id) {
+    Control::unregister_child(std::string id) {
+        for (std::vector<std::shared_ptr<Control>>::iterator i = _children.begin(), iend = _children.end(); i != iend; ++i) {
+            if (i->get()->ID() == id) {
                 _children.erase(i);
                 return true;
             }
         }
         return false;
-
     }
 
     // destructor
     Control::~Control() {
         // unregister ourselves from the parent if we have one (pages dont)
-        if (_parent != nullptr) _parent->unregister_child(_id);
+        if (nullptr == Parent.get()) Parent.get()->unregister_child(ID);
     }
 
     // allow the page class to tell us we're an anonymous instance
     void
-    Control::SetAutonomous(bool isauto) {
-        _autonomous = isauto;
+    Control::EnableAutonomous() {
+        if (this->AllowAutonomous) {
+            this->Autonomous = ROProperty<bool>(true);
+        }
     }
 
+#if FALSE
     static std::shared_ptr<Control> Control::fromHtmlNode(htmlcxx2::HTML::Node &node) {
         _Page = GetPage();
         if (_Page == nullptr) throw GridException(300, "Control must be attached to a page");
@@ -206,6 +200,35 @@ namespace GridIron {
         // if we're an autonomous Tag, automatically register the text string for access
         // otherwise client will have to manually register if they want it accessible
         if (_autonomous) _Page->RegisterVariable(_id + ".Text", &_text);
+    }
+#endif
+
+    /**
+     * Expose the protected addAttribute, returns whether call succeeded
+     * @param key
+     * @param value
+     * @return
+     */
+    inline bool Control::addAttribute(const std::string &key, const std::string &value) {
+        if (this->hasAttribute(key)) {
+            return false;
+        }
+        // call parent
+        htmlcxx2::HTML::Node::addAttribute(key, value);
+        return true;
+    }
+
+    inline bool Control::updateAttribute(const std::string &key, std::string &value) {
+        for (size_t i = 0, l = attributeKeys_.size(); i < l; ++i)
+        {
+            if (htmlcxx2::HTML::impl::icompare(attributeKeys_[i].c_str(), key.c_str()) == 0)
+            {
+                attributeValues_[i] = value;
+                return true;
+            }
+        }
+        // not found, try to add
+        return addAttribute(key, value);
     }
 
     // ------------------------------------------------

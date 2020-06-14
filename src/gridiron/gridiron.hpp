@@ -46,6 +46,17 @@ namespace GridIron {
     std::ostream &xmlEncode(std::ostream &dest, std::istream &source);
 
     std::string xmlEncode(std::string data);
+
+    enum PageStatus {
+        INITIALIZING,   // configuring dependencies and resources
+        INIT_READING,   // reading code-beside file
+        INIT_PARSING,   // parsing the read HTML DOM
+        PARSED_READY,   // class has finished initializing
+        MATCHING,       // Matching classes to parsed nodes
+        MATCHED_READY,  // logically there is another READY pause here prior to rendering being triggered
+        RENDERING,      // streaming data to standard out
+        RENDERED_READY  // streaming has completed
+    };
 }
 
 // Include the rest of gridiron's most primitive values
