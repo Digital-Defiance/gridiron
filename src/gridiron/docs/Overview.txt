@@ -2,7 +2,7 @@ Overview
 ======================================================
 
 The gridiron::Control class is the base of everything, even the Page class
-derives from it. The Control class maintains a heierarchy of Control objects.
+derives from it. The Control class maintains a hierarchy of Control objects.
 Every Control instance, except Page instance, knows its parent and children.
 
 To create an application, you must instantiate a Page class. The only argument
@@ -23,14 +23,18 @@ Template Tag Replacement - Principle Types
 
 Variable Tags
 ----------------------------
-<%=variable%>
+<gi::ContentValue key="GridIron.CodeBesideFile" />
+<gi::AttributeValue key="GridIron.CodeBesideFile" value="" />
 
 These tags will be directly replaced with the string contained in the
 variable referenced at render time. Variable names are alphanumeric and
-underscore only. The Tag may not contain spaces unless you configure with
---enable-vartag-spaces. The advantage in not allowing spaces prevents having
-to trim spaces off and results in a perhaps negligably faster, but simpler parsing.
-In a large page, this may add up.
+underscore only.
+ContentValue tags render the value into the <tag>space between</tag>.
+AttributeValue tags render the value into the value="" attribute.
+
+Anything provided into either value in the html will be considered the
+default value and it's Changed property will be relative to that rather
+than empty string.
 
 
 Control Tags (also see ControlTags.txt)
@@ -44,6 +48,10 @@ for example:
 
 Control tags must correspond with a control instance of the correct type and
 ID, except in the case of autonomous tags, described shortly.
+
+All attributes are passed through into the control, it is up to the control's
+code to filter out unwanted tags, or to define requirements. Otherwise attributes
+will be passed-through to the final rendered output, which could be intentional.
 
 
 Autonomous Tags (also see AutonomousTags.txt)
