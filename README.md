@@ -59,7 +59,9 @@ $ cmake ..
 
 **Requires**
 
-- `htmlcxx` via homebrew, apt/yum
+- C++17 or higher
+- htmlcxx2 header only library is included as a submodule
+- fmt format library is included as a submodule
 
 Example endpoint boilerplate (*the render mechanism is about to change)
 ```
