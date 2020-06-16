@@ -63,13 +63,13 @@ class Control : public GridIron::Node, public std::enable_shared_from_this<Contr
 
         ~Control();                                    // destructor
         std::shared_ptr<Page> // TODO: change to Page
-        GetPage();                                        // return pointer to parent page object (or self for page)
+        GetPage(bool rootOnly = false);                                        // return pointer to parent page object (or self for page)
         std::shared_ptr<Control>
         GetRoot();                                    // return pointer to the parent control object, regardless of type.
 
         std::shared_ptr<Control> Find(Control &control);
 
-        std::shared_ptr<Control> FindByID(const std::string id,
+        std::shared_ptr<Control> FindByID(const std::string &id,
                                     bool searchParentsIfNotChild = false);                    // find by id, starting with the current instance
         std::ostream &NamespacedTag(std::ostream &os);
 

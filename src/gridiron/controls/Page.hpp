@@ -56,7 +56,7 @@ namespace GridIron {
     // page classes are derived from control classes. They must have no parent (NULL).
     class Page : public Control {
     public:
-        Page(const char *codeBesideFilename);
+        explicit Page(const char *codeBesideFilename);
 
         ROProperty<ControlPass> Pass = ControlPass::FIRST;         // which pass the control is expected to be rendered on
         ROProperty<const char *> Namespace = GRIDIRON_XHTML_NS;         // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
@@ -73,22 +73,22 @@ namespace GridIron {
         friend std::ostream &operator<<(std::ostream &os, const Control &control);
 
         bool
-        RegisterRWVariable(const std::string name, std::shared_ptr<std::string> data);    // register a variable for front-page access
+        RegisterRWVariable(const std::string &name, std::shared_ptr<std::string> data);    // register a variable for front-page access
         bool
-        RegisterROVariable(const std::string name, std::shared_ptr<const std::string> const data);    // register a variable for front-page access
+        RegisterROVariable(const std::string &name, std::shared_ptr<const std::string> const data);    // register a variable for front-page access
 
         // make simpler syntax available
         inline bool
-        RegisterVariable(const std::string name, std::shared_ptr<std::string> data) {
+        RegisterVariable(const std::string &name, std::shared_ptr<std::string> data) {
             return RegisterRWVariable(name, data);
         }
         inline bool
-        RegisterVariable(const std::string name, std::shared_ptr<const std::string> const data) {
+        RegisterVariable(const std::string &name, std::shared_ptr<const std::string> const data) {
             return RegisterROVariable(name, data);
         }
 
 
-        static const std::string PathToFile(const std::string file);
+        static const std::string PathToFile(const std::string &file);
 
         const std::string PathToPage();
 
@@ -96,7 +96,7 @@ namespace GridIron {
             return &_tree;
         }
 
-        static std::shared_ptr<Page> fromHtmlNode(htmlcxx2::HTML::Node &node);
+//        static std::shared_ptr<Page> fromHtmlNode(htmlcxx2::HTML::Node &node);
 
     protected:
         kp::tree<htmlcxx2::HTML::Node> _tree;        // html tree

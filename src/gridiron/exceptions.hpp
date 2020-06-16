@@ -22,10 +22,7 @@ namespace GridIron {
     // simple exception class to hold an id and description- likely to be replaced...
     class GridException {
     public:
-        inline GridException(int id, const char *text) {
-            _id = id;
-            _string = std::string(text);
-        };
+        inline GridException(int id, const char *text) : _id{id}, _string{*text} {};
 
         inline const int id() const { return _id; };
 

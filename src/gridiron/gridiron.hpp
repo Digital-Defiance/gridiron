@@ -35,13 +35,13 @@
 namespace GridIron {
 
     // parse/find control type in <gridiron::XType ...>
-    static std::pair<std::string, std::string> gridironParseTag(std::string tag);
+    static std::pair<std::string, std::string> gridironParseTag(const std::string &tag);
 
-    std::ostream &xmlEncode(std::string &data, std::ostream &os);
+    std::ostream &xmlEncode(const std::string &data, std::ostream &os);
 
     std::ostream &xmlEncode(std::ostream &dest, std::istream &source);
 
-    std::string xmlEncode(std::string data);
+    std::string xmlEncode(const std::string &data);
 
     template<typename Base, typename T = Base>
     static inline bool instanceOf(std::shared_ptr<Base> p) {

@@ -13,7 +13,7 @@ namespace GridIron {
          * @param value
          * @return
          */
-        inline bool addAttribute(const std::string &key, const std::string &value) {
+        inline bool newAttribute(const std::string &key, const std::string &value) {
             if (this->hasAttribute(key)) {
                 return false;
             }
@@ -22,7 +22,7 @@ namespace GridIron {
             return true;
         }
 
-        inline bool updateAttribute(const std::string &key, std::string &value) {
+        inline bool updateAttribute(const std::string &key, const std::string &value) {
             for (size_t i = 0, l = attributeKeys_.size(); i < l; ++i)
             {
                 if (htmlcxx2::HTML::impl::icompare(attributeKeys_[i].c_str(), key.c_str()) == 0)
@@ -32,7 +32,7 @@ namespace GridIron {
                 }
             }
             // not found, try to add
-            return addAttribute(key, value);
+            return newAttribute(key, value);
         }
 
         inline bool deleteAttribute(const std::string &key) {

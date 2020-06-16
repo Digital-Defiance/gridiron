@@ -33,7 +33,6 @@ namespace GridIron {
     {
         this->tagName_ = std::string(GRIDIRON_XHTML_NS).append("::Page");
         int bytesread = 0;
-        int i = 0;
 
         HtmlFile = std::string(codeBesideFilename);
         if (HtmlFile.get().empty()) {
@@ -60,8 +59,8 @@ namespace GridIron {
         HtmlFilepath = ROProperty<std::string>(fullPagePath);
 
         // add/link default registered variables
-        _regvarsRW.insert({std::string(GRIDIRON_XHTML_NS).append(".FrontPage"), std::shared_ptr<std::string>(_htmlFilepath)});
-        _regvarsRW.insert({std::string(GRIDIRON_XHTML_NS).append(".CodeBesideFilename"), &_htmlFile});
+        _regvarsRO.insert({std::string(GRIDIRON_XHTML_NS).append(".FrontPage"), ROProperty(HtmlFilepath.get())});
+        _regvarsRO.insert({std::string(GRIDIRON_XHTML_NS).append(".CodeBesideFilename"), HtmlFile.getPointerRO()});
 
         // we sort of have a problem here. _namespace is constant. We don't want it to change
         // but we can't make the right hand side of the  map constant
@@ -99,13 +98,13 @@ namespace GridIron {
         this->Status = ROProperty<PageStatus>(PageStatus::PARSED_READY);
     }
 
-    const std::string Page::PathToFile(const std::string file) {
+    const std::string Page::PathToFile(const std::string &file) {
         std::filesystem::path basePath = std::filesystem::current_path();
         return basePath.append(GRIDIRON_HTML_DOCROOT).append(file);
     }
 
     const std::string Page::PathToPage() {
-        return PathToFile(this->_htmlFilepath);
+        return PathToFile(this->HtmlFilepath);
     }
 
     // TODO: all the std::cerr's are either debug printing or need to be converted to throws
@@ -269,7 +268,7 @@ namespace GridIron {
 
     // for controls to make variables available for HTML replacement. alphanumeric and _ only.
     bool
-    Page::RegisterRWVariable(const std::string name, std::shared_ptr<std::string> data) {
+    Page::RegisterRWVariable(const std::string &name, std::shared_ptr<std::string> data) {
         // NOTE: tags starting with __ should be system generated vars only, but we won't check
 
         // make sure name has a length
@@ -290,7 +289,7 @@ namespace GridIron {
     }
 
     bool
-    RegisterROVariable(const std::string name, std::shared_ptr<const std::string> const data) {
+    Page::RegisterROVariable(const std::string &name, std::shared_ptr<const std::string> const data) {
         // NOTE: tags starting with __ should be system generated vars only, but we won't check
 
         // make sure name has a length

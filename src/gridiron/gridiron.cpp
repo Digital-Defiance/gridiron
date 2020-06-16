@@ -17,7 +17,7 @@
 
 namespace GridIron {
     // parse control type out of Tag
-    std::pair<std::string, std::string> gridironParseTag(std::string tag) {
+    std::pair<std::string, std::string> gridironParseTag(const std::string &tag) {
         std::regex rgx("^<\\s*(:alpha:+)::(:alpha:+).*>");
         std::smatch matches;
         std::regex_search(tag, matches, rgx);
@@ -54,42 +54,44 @@ namespace GridIron {
     }
 
 
-    std::string xmlEncode(std::string data) {
+    std::string xmlEncode(const std::string &data) {
         if (data.empty())
             return data;
+
+        std::string retString = std::string(data);
 
         size_t pos;
         size_t minPos = 0;
         do {
-            pos = data.find_first_of("&\"\'<>", minPos);
-            char c = data[pos];
+            pos = retString.find_first_of("&\"\'<>", minPos);
+            char c = retString[pos];
             switch(c) {
                 case '&':
-                    data.replace(pos, 1, "&amp;");
+                    retString.replace(pos, 1, "&amp;");
                     minPos += 5;
                     break;
                 case '\"':
-                    data.replace(pos, 1, "&qout;");
+                    retString.replace(pos, 1, "&qout;");
                     minPos += 6;
                     break;
                 case '\'':
-                    data.replace(pos, 1, "&apos;");
+                    retString.replace(pos, 1, "&apos;");
                     minPos += 7;
                     break;
                 case '<':
-                    data.replace(pos, 1, "&lt;");
+                    retString.replace(pos, 1, "&lt;");
                     minPos += 4;
                     break;
                 case '>':
-                    data.replace(pos, 1, "&gt;");
+                    retString.replace(pos, 1, "&gt;");
                     minPos += 4;
                     break;
             }
         } while (pos != std::string::npos);
-        return data;
+        return retString;
     }
 
-    std::ostream& xmlEncode(std::string data, std::ostream& os) {
+    std::ostream& xmlEncode(const std::string &data, std::ostream& os) {
         os << xmlEncode(data);
         return os;
     }

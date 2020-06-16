@@ -74,13 +74,13 @@ namespace GridIron {
     // find the bottom-most control, only if a Page object
     // returns: pointer on success or nullptr, may be self
     std::shared_ptr<Page>
-    Control::GetPage(bool rootOnly = false) {
+    Control::GetPage(bool rootOnly) {
         std::shared_ptr<Control> ptr = This;
 
         // short circuit if already on page and either not rootOnly search or our parent is null (we're root)
-        if (GridIron::instanceOf<Control, Page>(ptr) && (!rootOnly || !ptr->Parent))) {
-            return This;
-        } else if (!ptr->Parent) {
+        if (GridIron::instanceOf<Control, Page>(ptr) && (!rootOnly || !ptr->Parent())) {
+            return std::dynamic_pointer_cast<std::shared_ptr<Page>>(This);
+        } else if (!ptr->Parent()) {
             // if no parent left to check either, we can just return now
             return nullptr;
         }
@@ -106,7 +106,7 @@ namespace GridIron {
 
     // recursive search through all controls under this object, return the one with specified id
     std::shared_ptr<Control>
-    Control::FindByID(const std::string id, bool searchParentsIfNotChild) {
+    Control::FindByID(const std::string &id, bool searchParentsIfNotChild) {
 
         // prioritize children first. if the end user wants to be efficient for a tree-wide search, start at root
         if (_children.size() > 0) {

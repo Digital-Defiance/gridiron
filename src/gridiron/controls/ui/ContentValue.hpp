@@ -10,7 +10,7 @@ namespace GridIron {
 
             class ContentValue : public GridIron::Control {
             public:
-                ContentValue(std::shared_ptr<Control> parent, const std::string key, std::string value = "");
+                ContentValue(std::shared_ptr<Control> parent, const std::string &key, std::string value);
 
                 ROProperty<ControlPass> Pass = ControlPass::SECOND;         // which pass the control is expected to be rendered on
                 ROProperty<const char *> Namespace = GRIDIRON_XHTML_NS;    // gridiron namespace so it can be accessed as a regvar (needs pointed to string)

@@ -32,7 +32,7 @@ namespace GridIron {
 
 
     template <class T, class U = T>
-    class RWProperty : BaseProperty<T> {
+    class RWProperty : public BaseProperty<T> {
     protected:
         T data;
 
@@ -83,14 +83,14 @@ namespace GridIron {
     };
 
     template <class T, class U = T>
-    class ROProperty : BaseProperty<T> {
+    class ROProperty : public BaseProperty<T> {
     protected:
         T data;
 
     public:
         // access with function call syntax
         ROProperty() : data() {};
-        ROProperty(T &data, bool reinterpret) : data{reinterpret_cast<U>(data)} {} // disambiguate
+        ROProperty(T &data, bool reinterpret) : data{std::dynamic_pointer_cast<U>(data)} {} // disambiguate
         ROProperty(T b) : data{b} {}
 
         inline T operator()() const {
@@ -197,14 +197,14 @@ namespace GridIron {
     };
 
     template <class T>
-    class AttributeMappedProperty : BaseProperty<T> {
+    class AttributeMappedProperty : public BaseProperty<T> {
     protected:
-        const GridIron::Node node_;
+        GridIron::Node *node_;
         T original;
         T data;
     public:
         // access with function call syntax
-        AttributeMappedProperty(T attributeData, GridIron::Node &node) : data{attributeData}, node_{node} {
+        AttributeMappedProperty(T attributeData, GridIron::Node &node) : data{attributeData}, node_{&node} {
             // locate the original attribute value and source the value
             if (node.hasAttribute(std::to_string(attributeData))) {
                 std::string value;
@@ -228,7 +228,7 @@ namespace GridIron {
         }
 
         inline T operator()(T const &value) {
-            node_.updateAttribute(std::to_string(data), value);
+            node_->updateAttribute(std::to_string(data), value);
             return data;
         }
 
@@ -239,16 +239,16 @@ namespace GridIron {
 
         // access with get()/set() syntax
         inline T get() const {
-            if (node_.hasAttribute(std::to_string(data))) {
+            if (node_->hasAttribute(std::to_string(data))) {
                 T value;
-                node_.attribute(std::to_string(data), value);
+                node_->attribute(std::to_string(data), value);
                 return value;
             }
             return T();
         }
 
         inline T set(T const &value) {
-            node_.updateAttribute(std::to_string(data), value);
+            node_->updateAttribute(std::to_string(data), value);
             return data;
         }
 
@@ -261,7 +261,7 @@ namespace GridIron {
         }
 
         inline T operator=(T const &value) {
-            node_.updateAttribute(std::to_string(data), value);
+            node_->updateAttribute(std::to_string(data), value);
             return data;
         }
 
@@ -269,18 +269,18 @@ namespace GridIron {
     };
 
     template <class T>
-    class ContentMappedProperty : BaseProperty<T> {
+    class ContentMappedProperty : public BaseProperty<T> {
     protected:
         bool changed_ = false;
-        const GridIron::Node node_;
+        GridIron::Node* node_;
         T original;
     public:
         // access with function call syntax
-        ContentMappedProperty(T attributeData, GridIron::Node &node) : node_{node} {
+        ContentMappedProperty(T attributeData, GridIron::Node &node) : node_{&node} {
             // locate the original attribute value and source the value
-            this->node_.text_ = std::to_string(attributeData);
+            this->node_->text_ = std::to_string(attributeData);
             this->original = std::to_string(attributeData);
-            this->changed_ = (this->original != node_.text_);
+            this->changed_ = (this->original != node_->text_);
         }
         ContentMappedProperty(ContentMappedProperty &property) {
             this->node_ = property.node_; // swap underlying nodes
@@ -289,12 +289,12 @@ namespace GridIron {
         }
 
         inline std::string operator()() const {
-            return this->node_.text_;
+            return this->node_->text_;
         }
 
         inline std::string operator()(T const &value) {
-            this->node_.text_ = std::to_string(value);
-            return this->node_.text_;
+            this->node_->text_ = std::to_string(value);
+            return this->node_->text_;
         }
 
         friend inline std::ostream &operator<<(std::ostream &os, ContentMappedProperty &property) {
@@ -304,12 +304,12 @@ namespace GridIron {
 
         // access with get()/set() syntax
         inline std::string get() const {
-            return this->node_.text_;
+            return this->node_->text_;
         }
 
         inline std::string set(T const &value) {
-            this->node_.text_ = std::to_string(value);
-            return this->node_.text_;
+            this->node_->text_ = std::to_string(value);
+            return this->node_->text_;
         }
 
         // access with '=' sign
@@ -321,12 +321,12 @@ namespace GridIron {
         }
 
         inline std::string operator=(T const &value) {
-            this->node_.text_ = std::to_string(value);
-            return this->node_.text_;
+            this->node_->text_ = std::to_string(value);
+            return this->node_->text_;
         }
 
         typedef T value_type; // might be useful for template deductions
     };
-};
+}
 
 #endif //GRIDIRON_PROPERTY_H

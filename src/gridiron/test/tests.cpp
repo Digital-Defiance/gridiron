@@ -1,7 +1,6 @@
 // TODO: make this test gridiron!
 
 #include <gridiron/controls/controls.hpp>
-#include <iostream>
 
 namespace GridIron {
 
