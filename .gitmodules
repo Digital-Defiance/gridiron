@@ -1,6 +1,6 @@
 [submodule "src/htmlcxx"]
 	path = src/htmlcxx2
-	url = git@github.com:jessica-mulein/htmlcxx.git
+	url = git@github.com:ProjectGridiron/htmlcxx.git
 [submodule "src/fmt"]
 	path = src/fmt
 	url = git@github.com:fmtlib/fmt.git
