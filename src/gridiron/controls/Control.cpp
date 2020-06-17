@@ -25,6 +25,7 @@
 #include <gridiron/controls/Control.hpp>
 
 namespace GridIron {
+    class Page;
 
     Control::Control(const char *id, std::shared_ptr<Control> parent) :
         This{shared_from_this()},
@@ -32,19 +33,14 @@ namespace GridIron {
         Parent{parent}
     {
         this->tagName_ = std::string(GRIDIRON_XHTML_NS).append("::Control");
-        std::shared_ptr<Control> result = shared_from_this();
-        std::shared_ptr<Page> _Page;
-
-        // INITIALIZE VARIABLES
-
         // we must have an ID- and only one instance of an id may exist on all controls under a page object
         if (ID.get().length() == 0) throw GridException(200, "no id specified");
 
         // find the page control if we have one, then look to see if the id is already registered
-        _Page = GetPage();
+        std::shared_ptr<Control> _Page = GetPage();
         if (_Page != nullptr) {
             // check page for existing controls with that id
-            result = _Page->FindByID(ID, true);
+            std::shared_ptr<Control> result = _Page->FindByID(ID, true);
             if (result != nullptr) throw GridException(201, "id already in use");
 
             // register ourselves with the parent if we have one (pages dont)
@@ -86,7 +82,7 @@ namespace GridIron {
         }
 
         // recursive call
-        return This->Parent->GetPage(readOnly);
+        return This()->Parent()->GetPage(readOnly);
     }
 
     std::shared_ptr<Control>
