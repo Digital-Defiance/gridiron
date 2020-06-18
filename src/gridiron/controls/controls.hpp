@@ -3,6 +3,7 @@
 
 #include <gridiron/controls/ui/AttributeValue.hpp>
 #include <gridiron/controls/ui/ContentValue.hpp>
+#include <gridiron/controls/ControlPass.hpp>
 #include <gridiron/controls/Control.hpp>
 #include <gridiron/controls/Page.hpp>
 

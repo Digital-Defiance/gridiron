@@ -4,8 +4,10 @@
 #include <htmlcxx2/htmlcxx2_html.hpp>
 #include <htmlcxx2/kp_tree.hh>
 
+#include <gridiron/properties.hpp>
+
 namespace GridIron {
-    class Node : public htmlcxx2::HTML::Node {
+    class Node : std::enable_shared_from_this<GridIron::Node>, public htmlcxx2::HTML::Node {
     public:
         /**
          * Expose the protected addAttribute, returns whether call succeeded
@@ -47,6 +49,18 @@ namespace GridIron {
             }
             return false;
         }
+
+        inline void updateText(const std::string &text) {
+            text_ = text;
+        }
+
+        inline std::shared_ptr<Node> This() {
+            return shared_from_this();
+        }
+
+        static std::shared_ptr<Node> Create() {
+            return std::make_shared<Node>();
+        };
     };
 }
 

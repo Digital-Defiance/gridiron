@@ -1,9 +1,14 @@
 # src/gridiron/CMakeLists.txt
 set(GRIDIRON_SOURCES
     ${GRIDIRON_INCLUDE_ROOT}/exceptions.hpp
-    ${GRIDIRON_INCLUDE_ROOT}/properties.hpp
     ${GRIDIRON_INCLUDE_ROOT}/gridiron.hpp
     ${GRIDIRON_SOURCE_ROOT}/gridiron.cpp
+    ${GRIDIRON_SOURCE_ROOT}/Node.hpp
+    ${GRIDIRON_SOURCE_ROOT}/ParserDom.hpp
+    ${GRIDIRON_INCLUDE_ROOT}/properties.hpp
+    ${GRIDIRON_SOURCE_ROOT}/AttributeMappedProperty.hpp
+    ${GRIDIRON_SOURCE_ROOT}/ContentMappedProperty.hpp
+    ${GRIDIRON_SOURCE_ROOT}/ComparedAttributeProperty.hpp
 ${GRIDIRON_CONTROL_SOURCES}
 )
 

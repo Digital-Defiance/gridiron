@@ -31,28 +31,22 @@
 #include <vector>
 #include <map>
 #include <memory>
-#include <gridiron/properties.hpp>
 #include <gridiron/exceptions.hpp>
 #include <gridiron/Node.hpp>
+#include <gridiron/controls/ControlPass.hpp>
 
 namespace GridIron {
-    enum ControlPass {
-        FIRST,
-        SECOND
-    };
     class ControlFactoryProxyBase;
-    class Page;
 
     // custom control base class, must derive
-class Control : public GridIron::Node, public std::enable_shared_from_this<Control> {
+class Control : public GridIron::Node {
     protected:
         Control(const char *id, std::shared_ptr<Control> parent);                // parent can be page type or control type
     public:
         ROProperty<std::string> ID;                                        // our id
-        ROProperty<std::shared_ptr<Control>> This;
         ROProperty<std::shared_ptr<Control>> Parent;                       // parent's pointer
         ROProperty<std::vector<std::shared_ptr<Control>>> Children;        // collection of pointers to child controls, by their address
-        ROProperty<ControlPass> Pass = ControlPass::FIRST;                 // which pass the control is expected to be rendered on
+        ROProperty<Controls::ControlPass> Pass = Controls::ControlPass::FIRST;                 // which pass the control is expected to be rendered on
         ROProperty<const char *> Namespace = GRIDIRON_XHTML_NS;            // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
         ROProperty<const char *> RenderTag = "html";                       // the associated codebeside tag name eg <namespace>::<tag>
         ROProperty<bool> IsPage = false;
@@ -62,7 +56,7 @@ class Control : public GridIron::Node, public std::enable_shared_from_this<Contr
         ROProperty<bool> ViewStateValid = ROProperty<bool>(false);      // whether viewstate was authenticated
 
         ~Control();                                    // destructor
-        std::shared_ptr<Page> // TODO: change to Page
+        std::shared_ptr<Control>
         GetPage(bool rootOnly = false);                                        // return pointer to parent page object (or self for page)
         std::shared_ptr<Control>
         GetRoot();                                    // return pointer to the parent control object, regardless of type.

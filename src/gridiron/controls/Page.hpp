@@ -39,7 +39,6 @@
 
 // local
 #include <gridiron/controls/Control.hpp>
-#include <gridiron/properties.hpp>
 
 namespace GridIron {
     enum PageStatus {
@@ -58,12 +57,11 @@ namespace GridIron {
     public:
         explicit Page(const char *codeBesideFilename);
 
-        ROProperty<ControlPass> Pass = ControlPass::FIRST;         // which pass the control is expected to be rendered on
+        ROProperty<GridIron::Controls::ControlPass> Pass = GridIron::Controls::ControlPass::FIRST;         // which pass the control is expected to be rendered on
         ROProperty<const char *> Namespace = GRIDIRON_XHTML_NS;         // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
         ROProperty<const char *> RenderTag = "html";    // the associated codebeside tag name eg <namespace>::<tag>
         ROProperty<bool> IsPage = true;
         ROProperty<GridIron::PageStatus> Status;
-        ROProperty<std::shared_ptr<Control>, std::shared_ptr<Page>> This;
         ROProperty<bool> AllowAutonomous = false; // can't have an autonomous page class
         ROProperty<bool> ViewStateEnabled = ROProperty<bool>(false);    // whether to bother serializing this object
         ROProperty<bool> ViewStateValid = ROProperty<bool>(false);      // whether viewstate was authenticated

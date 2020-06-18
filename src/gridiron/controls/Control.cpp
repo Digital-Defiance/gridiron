@@ -28,7 +28,6 @@ namespace GridIron {
     class Page;
 
     Control::Control(const char *id, std::shared_ptr<Control> parent) :
-        This{shared_from_this()},
         ID{id},
         Parent{parent}
     {
@@ -37,10 +36,10 @@ namespace GridIron {
         if (ID.get().length() == 0) throw GridException(200, "no id specified");
 
         // find the page control if we have one, then look to see if the id is already registered
-        std::shared_ptr<Control> _Page = GetPage();
+        std::shared_ptr<Page> _Page = GetPage();
         if (_Page != nullptr) {
             // check page for existing controls with that id
-            std::shared_ptr<Control> result = _Page->FindByID(ID, true);
+            std::shared_ptr<Control> result = _Page.get()->FindByID(ID, true);
             if (result != nullptr) throw GridException(201, "id already in use");
 
             // register ourselves with the parent if we have one (pages dont)
@@ -58,7 +57,7 @@ namespace GridIron {
     // returns: pointer - may be self
     std::shared_ptr<Control>
     Control::GetRoot(void) {
-        std::shared_ptr<Control> ptr = This;
+        std::shared_ptr<Control> ptr = this->This;
 
         while (ptr->Parent.get() != nullptr) {
             ptr = ptr->Parent.get();
@@ -69,7 +68,7 @@ namespace GridIron {
 
     // find the bottom-most control, only if a Page object
     // returns: pointer on success or nullptr, may be self
-    std::shared_ptr<Page>
+    std::shared_ptr<Control>
     Control::GetPage(bool rootOnly) {
         std::shared_ptr<Control> ptr = This;
 

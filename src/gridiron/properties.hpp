@@ -5,7 +5,7 @@
 #ifndef GRIDIRON_PROPERTY_H
 #define GRIDIRON_PROPERTY_H
 
-#include <gridiron/Node.hpp>
+#include <memory>
 
 namespace GridIron {
     template <class T>
@@ -29,7 +29,6 @@ namespace GridIron {
 
         typedef T value_type; // might be useful for template deductions
     };
-
 
     template <class T, class U = T>
     class RWProperty : public BaseProperty<T> {
@@ -167,165 +166,33 @@ namespace GridIron {
 
     template <class T, class U = T>
     class CompareProperty {
-        std::shared_ptr<const T> const originalData ;
-        std::shared_ptr<const T> const comparedData ;
+        const T* const originalData ;
+        const U* const comparedData ;
     public:
         explicit CompareProperty(const T &originalData, const U &comparedData) :
-            originalData{std::shared_ptr<const T>(&originalData)},
-            comparedData{std::shared_ptr<const T>(&comparedData)}
+            originalData{&originalData},
+            comparedData{&comparedData}
         {}
 
         // function call syntax
         bool operator()() const
         {
-            return (originalData.get() == comparedData.get());
+            return get();
         }
         // get/set syntax
         bool get() const
         {
-            return (originalData.get() == comparedData.get());
+            return (*originalData == *comparedData);
         }
         void set( T const & value ); // reserved but not implemented, per C++/CLI
 
         // use on rhs of '='
         explicit operator bool() const
         {
-            return (originalData.get() == comparedData.get());
+            return get();
         }
 
         typedef T value_type;  // might be useful for template deductions
-    };
-
-    template <class T>
-    class AttributeMappedProperty : public BaseProperty<T> {
-    protected:
-        GridIron::Node *node_;
-        T original;
-        T data;
-    public:
-        // access with function call syntax
-        AttributeMappedProperty(T attributeData, GridIron::Node &node) : data{attributeData}, node_{&node} {
-            // locate the original attribute value and source the value
-            if (node.hasAttribute(std::to_string(attributeData))) {
-                std::string value;
-                node.attribute(std::to_string(attributeData), value);
-                this->original = value;
-                this->changed_ = (this->original != this->data);
-            } else {
-                this->original = this->data;
-                this->changed_ = false;
-            }
-        }
-        AttributeMappedProperty(AttributeMappedProperty &property) {
-            this->node_ = property.node_;
-            this->original = property.original;
-            this->data = property.data;
-            this->changed_ = false;
-        }
-
-        inline T operator()() const {
-            return this->get();
-        }
-
-        inline T operator()(T const &value) {
-            node_->updateAttribute(std::to_string(data), value);
-            return data;
-        }
-
-        friend inline std::ostream &operator<<(std::ostream &os, AttributeMappedProperty &property) {
-            os << property.get();
-            return os;
-        }
-
-        // access with get()/set() syntax
-        inline T get() const {
-            if (node_->hasAttribute(std::to_string(data))) {
-                T value;
-                node_->attribute(std::to_string(data), value);
-                return value;
-            }
-            return T();
-        }
-
-        inline T set(T const &value) {
-            node_->updateAttribute(std::to_string(data), value);
-            return data;
-        }
-
-        // access with '=' sign
-        // in an industrial-strength library,
-        // specializations for appropriate types might choose to
-        // add combined operators like +=, etc.
-        inline operator T() const {
-            return get();
-        }
-
-        inline T operator=(T const &value) {
-            node_->updateAttribute(std::to_string(data), value);
-            return data;
-        }
-
-        typedef T value_type; // might be useful for template deductions
-    };
-
-    template <class T>
-    class ContentMappedProperty : public BaseProperty<T> {
-    protected:
-        bool changed_ = false;
-        GridIron::Node* node_;
-        T original;
-    public:
-        // access with function call syntax
-        ContentMappedProperty(T attributeData, GridIron::Node &node) : node_{&node} {
-            // locate the original attribute value and source the value
-            this->node_->text_ = std::to_string(attributeData);
-            this->original = std::to_string(attributeData);
-            this->changed_ = (this->original != node_->text_);
-        }
-        ContentMappedProperty(ContentMappedProperty &property) {
-            this->node_ = property.node_; // swap underlying nodes
-            this->original = property.original;
-            this->changed_ = property.changed_;
-        }
-
-        inline std::string operator()() const {
-            return this->node_->text_;
-        }
-
-        inline std::string operator()(T const &value) {
-            this->node_->text_ = std::to_string(value);
-            return this->node_->text_;
-        }
-
-        friend inline std::ostream &operator<<(std::ostream &os, ContentMappedProperty &property) {
-            os << property.get();
-            return os;
-        }
-
-        // access with get()/set() syntax
-        inline std::string get() const {
-            return this->node_->text_;
-        }
-
-        inline std::string set(T const &value) {
-            this->node_->text_ = std::to_string(value);
-            return this->node_->text_;
-        }
-
-        // access with '=' sign
-        // in an industrial-strength library,
-        // specializations for appropriate types might choose to
-        // add combined operators like +=, etc.
-        inline operator std::string() const {
-            return get();
-        }
-
-        inline std::string operator=(T const &value) {
-            this->node_->text_ = std::to_string(value);
-            return this->node_->text_;
-        }
-
-        typedef T value_type; // might be useful for template deductions
     };
 }
 

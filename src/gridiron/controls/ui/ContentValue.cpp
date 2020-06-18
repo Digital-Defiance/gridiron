@@ -4,10 +4,9 @@ namespace GridIron {
     namespace Controls {
         namespace UI {
             ContentValue::ContentValue(std::shared_ptr<Control> parent, const std::string &key, std::string value) :
-                    Control(std::string("value-").append(key).c_str(), parent),
-                    This{shared_from_this()},
-                    key{key, (*this)},
-                    value{value, (*this)}
+                Control(std::string("value-").append(key).c_str(), parent),
+                key{This(), key},
+                value{This(), value}
             {
                 this->tagName_ = std::string(GRIDIRON_XHTML_NS).append("::ContentValue");
             }

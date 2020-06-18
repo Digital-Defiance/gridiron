@@ -2,6 +2,7 @@
 #define GRIDIRON_ATTRIBUTEVALUE_HPP
 
 #include <gridiron/controls/Control.hpp>
+#include <gridiron/AttributeMappedProperty.hpp>
 
 namespace GridIron {
     namespace Controls {
@@ -15,9 +16,8 @@ namespace GridIron {
                 ROProperty<const char *> Namespace = GRIDIRON_XHTML_NS;    // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
                 ROProperty<const char *> RenderTag = "div";    // the associated codebeside tag name eg <namespace>::<tag>
 
-                ROProperty<std::shared_ptr<Control>, std::shared_ptr<AttributeValue>> This;
-                AttributeMappedProperty<std::string> key;
-                AttributeMappedProperty<std::string> value;
+                AttributeMappedProperty key;
+                AttributeMappedProperty value;
                 ROProperty<bool> AllowAutonomous = true;
             protected:
             };

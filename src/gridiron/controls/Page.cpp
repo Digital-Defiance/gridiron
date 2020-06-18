@@ -25,6 +25,7 @@
 
 
 #include <gridiron/controls/Page.hpp>
+#include <gridiron/ParserDom.hpp>
 
 namespace GridIron {
     Page::Page(const char *codeBesideFilename) : Control(codeBesideFilename, NULL),
@@ -90,7 +91,7 @@ namespace GridIron {
             throw GridException(103, "front-end file is empty");
         }
 
-        htmlcxx2::HTML::ParserDom parser;
+        GridIron::ParserDom parser;
         _tree = parser.parseTree(buffer);
         delete buffer;
 

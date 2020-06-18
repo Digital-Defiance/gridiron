@@ -5,9 +5,9 @@ namespace GridIron {
         namespace UI {
             AttributeValue::AttributeValue(std::shared_ptr<Control> parent, const std::string &key, std::string value) :
                     Control(std::string("value-").append(key).c_str(), parent),
-                    This{shared_from_this()},
-                    key{key, (*this)},
-                    value{value, (*this)} {
+                    key{This(), key},
+                    value{This(), value}
+            {
                 this->tagName_ = std::string(GRIDIRON_XHTML_NS).append("::AttributeValue");
             }
 
