@@ -28,12 +28,11 @@ namespace GridIron {
     namespace Controls {
         namespace UI {
             Label::Label(const char *id, std::shared_ptr<Control> parent) : Control(id, parent),
-                                                                            This{shared_from_this()},
-                                                                            Text{this->text()},
-                                                                            originalText{this->text()},
-                                                                            style{"", (*this)},
-                                                                            height{-1, (*this)},
-                                                                            width{-1, (*this)},
+                                                                            Text{text_},
+                                                                            originalText{text_},
+                                                                            style{This(), ""},
+                                                                            height{This(), "-1"},
+                                                                            width{This(), "-1"},
                                                                             Changed{originalText,
                                                                                     this->text()} // watcher property
             {

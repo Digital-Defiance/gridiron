@@ -28,8 +28,10 @@ namespace GridIron {
         // get/set syntax
         bool get() const
         {
+            // get the current value into newValue
             std::string newValue;
             node->attribute(attribute, newValue);
+            // compare against the original value
             return (originalData == newValue);
         }
 

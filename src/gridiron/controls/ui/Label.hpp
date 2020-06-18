@@ -27,12 +27,10 @@
 #include <string>
 #include <fstream>
 
-#include <gridiron/controls/Control.hpp>
+#include <gridiron/controls/Page.hpp>
+#include <gridiron/AttributeMappedProperty.hpp>
 
 namespace GridIron {
-    class Control;
-    class Page;
-
     namespace Controls {
         namespace UI {
         class Label : public GridIron::Control {

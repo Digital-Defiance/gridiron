@@ -17,17 +17,10 @@ namespace GridIron {
         AttributeMappedProperty(std::shared_ptr<GridIron::Node> node, const std::string attribute) :
                 attachedNode{node},
                 attribute_{attribute},
-                Changed{node, attribute} {
-            // locate the original attribute value and source the value
-            if (attachedNode->hasAttribute(attribute_)) {
-                // get the current attribute value into this->original
-                attachedNode->attribute(attribute_, this->original);
-            }
-        }
+                Changed{node, attribute} {}
 
         AttributeMappedProperty(AttributeMappedProperty &property) :
                 attachedNode{property.attachedNode},
-                original{property.original},
                 attribute_{property.attribute_},
                 Changed{property.attachedNode, property.attribute_} {}
 
@@ -75,7 +68,6 @@ namespace GridIron {
 
     protected:
         std::shared_ptr <GridIron::Node> attachedNode;
-        std::string original;
         const std::string attribute_;
     };
 }
