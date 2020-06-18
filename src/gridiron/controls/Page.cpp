@@ -60,8 +60,8 @@ namespace GridIron {
         HtmlFilepath = ROProperty<std::string>(fullPagePath);
 
         // add/link default registered variables
-        _regvarsRO.insert({std::string(GRIDIRON_XHTML_NS).append(".FrontPage"), ROProperty(HtmlFilepath.get())});
-        _regvarsRO.insert({std::string(GRIDIRON_XHTML_NS).append(".CodeBesideFilename"), HtmlFile.getPointerRO()});
+        _regvarsRO.insert({std::string(GRIDIRON_XHTML_NS).append(".FrontPage"), std::make_shared<std::string_view>(HtmlFilepath.get())});
+        _regvarsRO.insert({std::string(GRIDIRON_XHTML_NS).append(".CodeBesideFilename"), std::make_shared<std::string_view>(HtmlFile.get())});
 
         // we sort of have a problem here. _namespace is constant. We don't want it to change
         // but we can't make the right hand side of the  map constant
@@ -69,7 +69,7 @@ namespace GridIron {
         // do we need to change the type of the right hand side to handle constant and non constant
         // types with some sort of wrapper class?
 
-        _regvarsRW[".namespace"] = std::string(this->Namespace);
+        _regvarsRO.insert({".Namespace", std::make_shared<std::string_view>(this->Namespace)});
 
         // allocate mem
         std::string buffer;
@@ -82,7 +82,7 @@ namespace GridIron {
             buffer.append(buf, gcount);
         }
         // close the file
-        file.close();
+        ifs.close();
 
         // update status with another new property/RO status( does it work? )
         this->Status = ROProperty<PageStatus>(PageStatus::INIT_PARSING);
@@ -93,7 +93,6 @@ namespace GridIron {
 
         GridIron::ParserDom parser;
         _tree = parser.parseTree(buffer);
-        delete buffer;
 
         // update status with another new property/RO status( does it work? )
         this->Status = ROProperty<PageStatus>(PageStatus::PARSED_READY);
@@ -285,7 +284,7 @@ namespace GridIron {
         }
 
         // no existing var with same name found, register it
-        _regvarsRW[name] = data;
+        _regvarsRW.insert({name, data});
         return true;
     }
 

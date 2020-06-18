@@ -6,8 +6,8 @@
 
 namespace GridIron {
 
-    typedef kp::tree<GridIron::Node...> Tree;
+    typedef kp::tree<GridIron::Node> Tree;
 
-    class ParserDom : htmlcxx2::HTML::ParserDom {};
+    class ParserDom : public htmlcxx2::HTML::ParserDom {};
 }
 #endif //GRIDIRON_PARSERDOM_HPP

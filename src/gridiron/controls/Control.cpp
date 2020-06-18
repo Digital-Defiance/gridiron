@@ -70,11 +70,11 @@ namespace GridIron {
     // returns: pointer on success or nullptr, may be self
     std::shared_ptr<Control>
     Control::GetPage(bool rootOnly) {
-        std::shared_ptr<Control> ptr = This;
+        std::shared_ptr<Node> ptr = This();
 
         // short circuit if already on page and either not rootOnly search or our parent is null (we're root)
-        if (GridIron::instanceOf<Control, Page>(ptr) && (!rootOnly || !ptr->Parent())) {
-            return std::dynamic_pointer_cast<std::shared_ptr<Page>>(This);
+        if (GridIron::instanceOf<Node, Page>(ptr) && (!rootOnly || !ptr->Parent())) {
+            return std::dynamic_pointer_cast<std::shared_ptr<Page>>(This());
         } else if (!ptr->Parent()) {
             // if no parent left to check either, we can just return now
             return nullptr;

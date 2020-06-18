@@ -99,7 +99,7 @@ namespace GridIron {
     protected:
         kp::tree<htmlcxx2::HTML::Node> _tree;        // html tree
         std::map<const std::string, RWProperty<std::shared_ptr<std::string>>> _regvarsRW;            // registered variables for frontpage access
-        std::map<const std::string, ROProperty<std::shared_ptr<const std::string>>> _regvarsRO;
+        std::map<const std::string, ROProperty<std::shared_ptr<std::string_view>>> _regvarsRO;
         std::map<const htmlcxx2::HTML::Node *, std::shared_ptr<GridIron::Control>> _nodemap;            // registered nodes
     };
 }
