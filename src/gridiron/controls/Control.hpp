@@ -39,7 +39,7 @@ namespace GridIron {
     class ControlFactoryProxyBase;
 
     // custom control base class, must derive
-class Control : public GridIron::Node {
+    class Control : public GridIron::Node {
     protected:
         Control(const char *id, std::shared_ptr<Control> parent);                // parent can be page type or control type
     public:

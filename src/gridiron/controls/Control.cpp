@@ -36,7 +36,7 @@ namespace GridIron {
         if (ID.get().length() == 0) throw GridException(200, "no id specified");
 
         // find the page control if we have one, then look to see if the id is already registered
-        std::shared_ptr<Page> _Page = GetPage();
+        std::shared_ptr<Control> _Page = GetPage();
         if (_Page != nullptr) {
             // check page for existing controls with that id
             std::shared_ptr<Control> result = _Page.get()->FindByID(ID, true);
@@ -44,7 +44,7 @@ namespace GridIron {
 
             // register ourselves with the parent if we have one (pages dont)
             // parent will have a pointer to our id string to save mem and allow for changes
-            if (Parent.get() != nullptr) Parent.get()->registerChild(ID.get(), This);
+            if (Parent.get() != nullptr) Parent.get()->registerChild(ID.get(), This());
         }
     }
 

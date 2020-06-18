@@ -67,7 +67,7 @@ namespace GridIron {
         ComparedAttributeProperty Changed;
 
     protected:
-        std::shared_ptr <GridIron::Node> attachedNode;
+        std::shared_ptr<GridIron::Node> attachedNode;
         const std::string attribute_;
     };
 }

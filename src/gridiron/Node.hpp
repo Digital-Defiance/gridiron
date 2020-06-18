@@ -7,7 +7,7 @@
 #include <gridiron/properties.hpp>
 
 namespace GridIron {
-    class Node : std::enable_shared_from_this<GridIron::Node>, public htmlcxx2::HTML::Node {
+    class Node : public htmlcxx2::HTML::Node, public std::enable_shared_from_this<Node> {
     public:
         /**
          * Expose the protected addAttribute, returns whether call succeeded
