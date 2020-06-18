@@ -35,7 +35,7 @@ namespace GridIron {
         namespace UI {
         class Label : public GridIron::Control {
             public:
-                Label(const char *id, std::shared_ptr<Control> parent);
+                Label(const char *id, Control* parent);
 
                 ROProperty<ControlPass> Pass = ControlPass::FIRST;         // which pass the control is expected to be rendered on
                 ROProperty<const char *> Namespace = GRIDIRON_XHTML_NS;         // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
@@ -44,9 +44,9 @@ namespace GridIron {
                 ROProperty<bool> Autonomous = false;
                 ROIndirectProperty<std::string> Text;
                 CompareProperty<std::string> Changed;
-                AttributeMappedProperty<std::string> style;
-                AttributeMappedProperty<int> height;
-                AttributeMappedProperty<int> width;
+                AttributeMappedProperty style;
+                AttributeMappedProperty height;
+                AttributeMappedProperty width;
 
             protected:
                 // TODO: this whole approach is stuck inbetween. Need a Property/Attribute map class?

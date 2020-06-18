@@ -27,17 +27,21 @@
 namespace GridIron {
     namespace Controls {
         namespace UI {
-            Label::Label(const char *id, std::shared_ptr<Control> parent) : Control(id, parent),
-                                                                            Text{text_},
-                                                                            originalText{text_},
-                                                                            style{This(), ""},
-                                                                            height{This(), "-1"},
-                                                                            width{This(), "-1"},
-                                                                            Changed{originalText,
-                                                                                    this->text()} // watcher property
+            Label::Label(const char *id, Control* parent) : Control(id, parent),
+                Text{text_},
+                originalText{text_},
+                Changed{originalText,this->text()} // watcher property
             {
+                this->style = AttributeMappedProperty(reinterpret_cast<Node*>(&this), "");
+//                style{this, ""},
+//                        height{this, "-1"},
+//                        width{this, "-1"},
+
                 // ensure the text is not copied now, only when accessed
-                parent->GetPage()->RegisterROVariable(ID.get().append(".Text"), this->Text.ROPointer());
+                if (parent != nullptr) {
+                    Page* p = reinterpret_cast<Page*>(parent->GetPage());
+                    p->RegisterROVariable(p->ID.get().append(".Text"), std::make_shared<std::string_view>(this->Text));
+                }
             }
 
 #if FALSE

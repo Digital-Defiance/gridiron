@@ -23,11 +23,12 @@
 
 #include <gridiron/gridiron.hpp>
 #include <gridiron/controls/Control.hpp>
+#include <gridiron/ParserDom.hpp>
 
 namespace GridIron {
     class Page;
 
-    Control::Control(const char *id, std::shared_ptr<Control> parent) :
+    Control::Control(const char *id, Control* parent) :
         ID{id},
         Parent{parent}
     {
@@ -36,15 +37,15 @@ namespace GridIron {
         if (ID.get().length() == 0) throw GridException(200, "no id specified");
 
         // find the page control if we have one, then look to see if the id is already registered
-        std::shared_ptr<Control> _Page = GetPage();
+        Control* _Page = GetPage();
         if (_Page != nullptr) {
             // check page for existing controls with that id
-            std::shared_ptr<Control> result = _Page.get()->FindByID(ID, true);
+            Control* result = _Page->FindByID(ID, true);
             if (result != nullptr) throw GridException(201, "id already in use");
 
             // register ourselves with the parent if we have one (pages dont)
             // parent will have a pointer to our id string to save mem and allow for changes
-            if (Parent.get() != nullptr) Parent.get()->registerChild(ID.get(), This());
+            if (Parent.get() != nullptr) Parent.get()->registerChild(ID.get(), this);
         }
     }
 
@@ -55,70 +56,33 @@ namespace GridIron {
 
     // find the bottom-most control, regardless of type
     // returns: pointer - may be self
-    std::shared_ptr<Control>
-    Control::GetRoot(void) {
-        std::shared_ptr<Control> ptr = this->This;
-
-        while (ptr->Parent.get() != nullptr) {
-            ptr = ptr->Parent.get();
+    Control*
+    Control::GetRoot(GridIron::ParserDom &parser) {
+        GridIron::Tree t = parser.root();
+        GridIron::Tree::iterator i = t.begin();
+        if (i->isTag() && i->isRoot()) {
+            return reinterpret_cast<Control *>(i.node);
         }
-
-        return ptr;
+        return nullptr;
     }
 
     // find the bottom-most control, only if a Page object
     // returns: pointer on success or nullptr, may be self
-    std::shared_ptr<Control>
-    Control::GetPage(bool rootOnly) {
-        std::shared_ptr<Node> ptr = This();
-
-        // short circuit if already on page and either not rootOnly search or our parent is null (we're root)
-        if (GridIron::instanceOf<Node, Page>(ptr) && (!rootOnly || !ptr->Parent())) {
-            return std::dynamic_pointer_cast<std::shared_ptr<Page>>(This());
-        } else if (!ptr->Parent()) {
-            // if no parent left to check either, we can just return now
+    Page*
+    Control::GetPage(ParserDom &parser, bool rootOnly) {
+        Control *c = GetRoot(parser);
+        if (c == nullptr) {
             return nullptr;
         }
-
-        // recursive call
-        return This()->Parent()->GetPage(readOnly);
-    }
-
-    std::shared_ptr<Control>
-    Control::Find(Control& control) {
-        // check map
-        std::map<Control*, std::shared_ptr<Control>>::iterator it = _controlsByControl.find(&control);
-        if (it != _controlsByControl.end()) {
-            return it->first->This;
-        }
-        // not found, create a shared pointer
-        std::shared_ptr<Control> spC = std::shared_ptr<Control> (&control);
-        // add to map
-        std::pair<std::map<Control*, std::shared_ptr<Control>>::iterator,bool> inserted = _controlsByControl.insert(std::make_pair(&control,std::move(spC)));
-        // return the shared pointer
-        return inserted.first->first->This;
+        return reinterpret_cast<Page*>(c);
     }
 
     // recursive search through all controls under this object, return the one with specified id
-    std::shared_ptr<Control>
-    Control::FindByID(const std::string &id, bool searchParentsIfNotChild) {
-
-        // prioritize children first. if the end user wants to be efficient for a tree-wide search, start at root
-        if (_children.size() > 0) {
-            // search immediate children first
-            for (std::vector<std::shared_ptr<Control>>::iterator it = _children.begin(); it != _children.end(); ++it) {
-                // check the child's id first
-                if ((*it)->ID.get().compare(id) == 0) {
-                    return (*it)->This;
-                }
-            }
-        }
-
-        if (searchParentsIfNotChild) {
-            std::map<std::string, std::shared_ptr<Control>>::iterator it = _controlsByID.find(id);
-            if (it != _controlsByID.end()) {
-                return it->second;
-            }
+    Control*
+    Control::FindByID(const std::string &id) {
+        std::map<const std::string, Control*>::iterator it = _controlsByID.find(id);
+        if (it != _controlsByID.end()) {
+            return it->second;
         }
 
         // no luck
@@ -136,17 +100,17 @@ namespace GridIron {
 
     // register this control with the parent
     bool
-    Control::registerChild(std::string id, std::shared_ptr<Control> control) {
-        if (id.empty() || (control == nullptr)) return false;
+    Control::registerChild(const std::string id, Control &control) {
+        if (id.empty()) return false;
 
         // check for duplicates first
-        for (std::vector<std::shared_ptr<Control>> ::iterator it = _children.begin(); it != _children.end(); ++it) {
+        for (std::vector<Control*> ::iterator it = _children.begin(); it != _children.end(); ++it) {
             if ((*it)->ID() == id) return false;    // id already in list
         }
 
 
         // then add
-        _children.push_back(control->This);
+        _children.push_back(&control);
         std::cerr << "There are now " << _children.size() << " children registered." << std::endl;
 
         return true;
@@ -154,9 +118,9 @@ namespace GridIron {
 
     // unregister this control from the parent
     bool
-    Control::unregister_child(std::string id) {
-        for (std::vector<std::shared_ptr<Control>>::iterator i = _children.begin(), iend = _children.end(); i != iend; ++i) {
-            if (i->get()->ID() == id) {
+    Control::unregister_child(const std::string id) {
+        for (std::vector<Control*>::iterator i = _children.begin(), iend = _children.end(); i != iend; ++i) {
+            if ((*i)->ID() == id) {
                 _children.erase(i);
                 return true;
             }
@@ -167,7 +131,7 @@ namespace GridIron {
     // destructor
     Control::~Control() {
         // unregister ourselves from the parent if we have one (pages dont)
-        if (nullptr == Parent.get()) Parent.get()->unregister_child(ID);
+        if (nullptr == Parent) Parent->unregister_child(ID);
     }
 
     // allow the page class to tell us we're an anonymous instance
@@ -247,8 +211,8 @@ namespace GridIron {
     }
 
     // iterates through the control types that have registered, tells the proxy to create us one if its type matches
-    std::shared_ptr<Control>
-    ControlFactory::CreateByType(const char *type, const char *id, std::shared_ptr<Control> parent) {
+    Control*
+    ControlFactory::CreateByType(const char *type, const char *id, Control* parent) {
         std::cerr << "Requesting creation of type " << type << std::endl;
         for (int i = 0; i < _controlProxies->size(); ++i) {
             if (strcmp(_controlProxies->at(i)->GetType(), type) == 0) {

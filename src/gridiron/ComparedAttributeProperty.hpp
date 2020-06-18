@@ -10,13 +10,13 @@ namespace GridIron {
      */
     class ComparedAttributeProperty {
     public:
-        explicit ComparedAttributeProperty(std::shared_ptr<GridIron::Node> n, const std::string a) :
-                node{n},
+        explicit ComparedAttributeProperty(GridIron::Node &n, const std::string a) :
+                node{&n},
                 attribute{a}
         {
-            if (n->hasAttribute(a)) {
+            if (node->hasAttribute(attribute)) {
                 // copy the original data
-                n->attribute(a, originalData);
+                node->attribute(attribute, originalData);
             }
         }
 
@@ -42,7 +42,7 @@ namespace GridIron {
         }
 
     protected:
-        const std::shared_ptr<GridIron::Node> node;
+        GridIron::Node* node;
         const std::string attribute;
         std::string originalData;
     };

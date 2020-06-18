@@ -29,8 +29,7 @@
 
 namespace GridIron {
     Page::Page(const char *codeBesideFilename) : Control(codeBesideFilename, NULL),
-        Status{PageStatus::INITIALIZING},
-        This{shared_from_this()}
+        Status{PageStatus::INITIALIZING}
     {
         this->tagName_ = std::string(GRIDIRON_XHTML_NS).append("::Page");
         int bytesread = 0;
@@ -43,7 +42,7 @@ namespace GridIron {
         // make up an id until we parse and match up with one
         ID = ROProperty<std::string>(std::string(Namespace).append("::Page::").append(HtmlFile));    // default id = "_Page_" or "_Page_foobar.html"
 
-        if (codeBesideFilename.empty()) {
+        if (std::string(codeBesideFilename).empty()) {
             // if no front-page is given, the caller will have to render everything themselves
             // this is fine, but we're done here.
             return;
@@ -91,8 +90,7 @@ namespace GridIron {
             throw GridException(103, "front-end file is empty");
         }
 
-        GridIron::ParserDom parser;
-        _tree = parser.parseTree(buffer);
+        _tree = _parser.parseTree(buffer);
 
         // update status with another new property/RO status( does it work? )
         this->Status = ROProperty<PageStatus>(PageStatus::PARSED_READY);

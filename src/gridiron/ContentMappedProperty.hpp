@@ -16,15 +16,15 @@ namespace GridIron {
     public:
     public:
         // access with function call syntax
-        ContentMappedProperty(std::shared_ptr<GridIron::Node> node) :
-            attachedNode{node},
-            original{node->text()},
-            Changed{node, node->text()} {}
+        ContentMappedProperty(GridIron::Node &node) :
+            attachedNode{&node},
+            original{node.text()},
+            Changed{node, node.text()} {}
 
         ContentMappedProperty(ContentMappedProperty &property) :
             attachedNode{property.attachedNode},
             original{property.original},
-            Changed{property.attachedNode, property.original} {}
+            Changed{*property.attachedNode, property.original} {}
 
         inline std::string operator()() const {
             return this->get();
@@ -64,7 +64,7 @@ namespace GridIron {
         ComparedAttributeProperty Changed;
 
     protected:
-        std::shared_ptr <GridIron::Node> attachedNode;
+        GridIron::Node* attachedNode;
         std::string original;
     };
 }

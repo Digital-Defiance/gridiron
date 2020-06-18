@@ -7,7 +7,7 @@
 #include <gridiron/properties.hpp>
 
 namespace GridIron {
-    class Node : public htmlcxx2::HTML::Node, public std::enable_shared_from_this<Node> {
+    class Node : public htmlcxx2::HTML::Node {
     public:
         /**
          * Expose the protected addAttribute, returns whether call succeeded
@@ -53,14 +53,6 @@ namespace GridIron {
         inline void updateText(const std::string &text) {
             text_ = text;
         }
-
-        inline std::shared_ptr<Node> This() {
-            return shared_from_this();
-        }
-
-        static std::shared_ptr<Node> Create() {
-            return std::make_shared<Node>();
-        };
     };
 }
 

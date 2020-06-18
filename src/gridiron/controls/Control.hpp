@@ -34,18 +34,18 @@
 #include <gridiron/exceptions.hpp>
 #include <gridiron/Node.hpp>
 #include <gridiron/controls/ControlPass.hpp>
+#include <gridiron/ParserDom.hpp>
 
 namespace GridIron {
+    class Page;
     class ControlFactoryProxyBase;
 
     // custom control base class, must derive
     class Control : public GridIron::Node {
     protected:
-        Control(const char *id, std::shared_ptr<Control> parent);                // parent can be page type or control type
+        Control(const char *id, Control* parent = nullptr);                // parent can be page type or control type
     public:
         ROProperty<std::string> ID;                                        // our id
-        ROProperty<std::shared_ptr<Control>> Parent;                       // parent's pointer
-        ROProperty<std::vector<std::shared_ptr<Control>>> Children;        // collection of pointers to child controls, by their address
         ROProperty<Controls::ControlPass> Pass = Controls::ControlPass::FIRST;                 // which pass the control is expected to be rendered on
         ROProperty<const char *> Namespace = GRIDIRON_XHTML_NS;            // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
         ROProperty<const char *> RenderTag = "html";                       // the associated codebeside tag name eg <namespace>::<tag>
@@ -56,15 +56,12 @@ namespace GridIron {
         ROProperty<bool> ViewStateValid = ROProperty<bool>(false);      // whether viewstate was authenticated
 
         ~Control();                                    // destructor
-        std::shared_ptr<Control>
-        GetPage(bool rootOnly = false);                                        // return pointer to parent page object (or self for page)
-        std::shared_ptr<Control>
-        GetRoot();                                    // return pointer to the parent control object, regardless of type.
+        Page*
+        GetPage(ParserDom &parser, bool rootOnly = false);                                        // return pointer to parent page object (or self for page)
+        Control*
+        GetRoot(ParserDom &parser);                                    // return pointer to the parent control object, regardless of type.
 
-        std::shared_ptr<Control> Find(Control &control);
-
-        std::shared_ptr<Control> FindByID(const std::string &id,
-                                    bool searchParentsIfNotChild = false);                    // find by id, starting with the current instance
+        Control* FindByID(const std::string &id);                    // find by id, starting with the current instance
         std::ostream &NamespacedTag(std::ostream &os);
 
         std::string NamespacedTag();
@@ -87,9 +84,9 @@ namespace GridIron {
 
     protected:
         virtual bool
-        registerChild(std::string id, std::shared_ptr<Control> control);    // add child control's id and name to the bimap
+        registerChild(const std::string id, Control &control);    // add child control's id and name to the bimap
         virtual bool
-        unregister_child(std::string id);                    // delete child control's id and name from the bimap
+        unregister_child(const std::string id);                    // delete child control's id and name from the bimap
 
         std::string _parsed;                                               // data after parsing- only data relevant to our id
 
@@ -99,11 +96,9 @@ namespace GridIron {
          */
 
         // memory overhead warning...
-        std::vector<std::shared_ptr<Control>> _children; // TODO: seems duplicated by our node tree?
-        static std::map<std::string, std::shared_ptr<Control>> _controlsByID;
-        static std::map<Control *, std::shared_ptr<Control>> _controlsByControl;
-        static std::map<std::string, std::shared_ptr<Control>> _controlsByNamespace;
-        static std::map<std::string, std::shared_ptr<Control>> _controlsByControlTag;
+        static std::map<const std::string, Control*> _controlsByID;
+        static std::map<const std::string, std::vector<Control*>> _controlsByNamespace;
+        static std::map<const std::string, std::vector<Control*>> _controlsByControlTag;
         static std::set<std::string> _registeredNamespaces;
     };
 
@@ -124,7 +119,7 @@ namespace GridIron {
 
         void Register(const ControlFactoryProxyBase *proxy);
 
-        std::shared_ptr<Control> CreateByType(const char *type, const char *id, std::shared_ptr<Control> parent);
+        std::shared_ptr<Control> CreateByType(const char *type, const char *id, Control* parent);
 
         int GetCount();
 
@@ -147,7 +142,7 @@ namespace GridIron {
             globalControlFactory.Register(this);
         }
 
-        virtual std::shared_ptr<Control> CreateObject(const char *id, std::shared_ptr<Control> parent) const = 0;
+        virtual Control* CreateObject(const char *id, Control* parent) const = 0;
 
         // Expose criteria here
         virtual const char* GetType() const = 0;
@@ -156,9 +151,9 @@ namespace GridIron {
     // instantiate one of these in the .cpp file of every derived control class you want autos for
     template<class T>
     class ControlFactoryProxy : public ControlFactoryProxyBase {
-        inline virtual std::shared_ptr<Control> CreateObject(const char *id, std::shared_ptr<Control> parent) const {
+        inline virtual Control* CreateObject(const char *id, Control* parent) const {
             if (!T::AllowAutonomous) return nullptr;
-            std::shared_ptr<Control> pointer = std::make_shared<Control>(new T(id, parent));
+            Control* pointer = new T(id, parent);
             if (pointer == nullptr) return nullptr;
             pointer->Control::EnableAutonomous();
             return pointer;

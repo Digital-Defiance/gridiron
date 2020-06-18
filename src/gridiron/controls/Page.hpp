@@ -39,6 +39,7 @@
 
 // local
 #include <gridiron/controls/Control.hpp>
+#include <gridiron/ParserDom.hpp>
 
 namespace GridIron {
     enum PageStatus {
@@ -90,14 +91,15 @@ namespace GridIron {
 
         const std::string PathToPage();
 
-        inline kp::tree<htmlcxx2::HTML::Node>* HtmlTree() {
+        inline kp::tree<GridIron::Node>* HtmlTree() {
             return &_tree;
         }
 
 //        static std::shared_ptr<Page> fromHtmlNode(htmlcxx2::HTML::Node &node);
 
     protected:
-        kp::tree<htmlcxx2::HTML::Node> _tree;        // html tree
+        GridIron::ParserDom _parser;
+        Tree _tree;        // html tree
         std::map<const std::string, RWProperty<std::shared_ptr<std::string>>> _regvarsRW;            // registered variables for frontpage access
         std::map<const std::string, ROProperty<std::shared_ptr<std::string_view>>> _regvarsRO;
         std::map<const htmlcxx2::HTML::Node *, std::shared_ptr<GridIron::Control>> _nodemap;            // registered nodes

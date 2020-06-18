@@ -131,10 +131,6 @@ namespace GridIron {
     public:
         explicit ROIndirectProperty(const T &data) : data{std::shared_ptr<const T>(&data)} {}
 
-        inline std::shared_ptr<const T> ROPointer() const {
-            return std::shared_ptr<const T>(data);
-        }
-
         // this function must be called by the containing class, normally in a
         // constructor, to initialize the ROProperty so it knows where its
         // real implementation code can be found. obj is usually the containing
