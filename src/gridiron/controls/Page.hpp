@@ -35,7 +35,7 @@
 #include <typeinfo>
 #include <vector>
 
-#include <fmt/include/fmt/printf.h>
+#include <fmt/include/fmt/core.h>
 
 // local
 #include <gridiron/controls/Control.hpp>
