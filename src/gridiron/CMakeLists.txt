@@ -26,10 +26,13 @@ target_include_directories(gridiron-object PUBLIC "${GRIDIRON_INCLUDE_ROOT}/../"
 target_include_directories(gridiron-static PUBLIC "${GRIDIRON_INCLUDE_ROOT}/../")
 target_include_directories(gridiron-shared PUBLIC "${GRIDIRON_INCLUDE_ROOT}/../")
 
-add_dependencies(gridiron-object htmlcxx2)
+add_dependencies(gridiron-object htmlcxx2 nall)
 target_link_libraries(gridiron-object PUBLIC htmlcxx2)
 target_link_libraries(gridiron-static PUBLIC htmlcxx2)
 target_link_libraries(gridiron-shared PUBLIC htmlcxx2)
+target_link_libraries(gridiron-object PUBLIC nall)
+target_link_libraries(gridiron-static PUBLIC nall)
+target_link_libraries(gridiron-shared PUBLIC nall)
 
 set_target_properties(gridiron-object PROPERTIES
     VERSION ${GRIDIRON_VERSION}
