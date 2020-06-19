@@ -6,6 +6,7 @@
 #define GRIDIRON_PROPERTY_H
 
 #include <memory>
+#include <nall/string.hpp>
 
 namespace GridIron {
     template <class T>
