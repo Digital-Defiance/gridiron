@@ -4,3 +4,6 @@
 [submodule "src/fmt"]
 	path = src/fmt
 	url = git@github.com:fmtlib/fmt.git
+[submodule "src/byuu-nall"]
+	path = src/byuu-nall
+	url = git@github.com:jessica-mulein/byuu-nall.git
