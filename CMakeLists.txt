@@ -4,39 +4,29 @@ cmake_minimum_required(VERSION 3.15)
 cmake_policy(VERSION 3.15)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
+set(GRIDIRON_VERSION "0.1.10")
+set(GRIDIRON_VERSION_MAJOR "0")
+set(GRIDIRON_XHTML_NS "\"gi\"")
+set(GRIDIRON_HTML_DOCROOT "html")
+set(GRIDIRON_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+set(GRIDIRON_SOURCE_ROOT ${GRIDIRON_ROOT}/src/gridiron)
+set(GRIDIRON_INCLUDE_ROOT ${GRIDIRON_ROOT}/src/gridiron)
+
 project(gridiron
-    VERSION 0.1.10
-    DESCRIPTION "GridIron C++ framework"
     LANGUAGES CXX
+    VERSION ${GRIDIRON_VERSION}
+#    SOVERSION ${GRIDIRON_VERSION_MAJOR}
+    DESCRIPTION "GridIron C++ framework"
 )
 
-set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.72 REQUIRED COMPONENTS
-        date_time filesystem iostreams)
-
-include_directories(SYSTEM ${BOOST_INCLUDE_DIR})
-find_package(HtmlCxx REQUIRED)
-include_directories(SYSTEM ${HTMLCXX_INCLUDE_DIRS})
-
-find_package(oatpp          1.1.0 REQUIRED)
-find_library(oatpp          1.1.0 REQUIRED)
-find_package(oatpp-swagger  1.1.0 REQUIRED)
-include_directories(SYSTEM ${oatpp_INCLUDE_DIRS})
-
-link_libraries(
-        Boost::date_time
-        Boost::filesystem
-        Boost::iostreams
+# CONFIGURE GRIDIRON
+set(GRIDIRON_COMPILE_DEFS
+    PUBLIC GRIDIRON_XHTML_NS=${GRIDIRON_XHTML_NS}
+    PUBLIC GRIDIRON_HTML_DOCROOT="${GRIDIRON_HTML_DOCROOT}"
 )
-
-set(CMAKE_REQUIRED_INCLUDES ${BOOST_INCLUDE_DIR})
-set(CMAKE_REQUIRED_LIBRARIES ${HTMLCXX_LIBRARY})
-
-include_directories(SYSTEM include)
 
 # Only do these if this is the main project, and not if it is included through add_subdirectory
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-
     # Optionally set things like CMAKE_CXX_STANDARD, CMAKE_POSITION_INDEPENDENT_CODE here
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -52,6 +42,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     # Note this needs to be done in the main CMakeLists
     # since it calls enable_testing, which must be in the
     # main CMakeLists.
+    enable_testing()
     include(CTest)
 
     # Docs only available if this is the main app
@@ -70,51 +61,4 @@ if((CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME OR MODERN_CMAKE_BUILD_TESTING) AND 
     add_subdirectory(src/gridiron/test)
 endif()
 
-add_subdirectory(src/gridiron)
-add_library(gridiron-oatpp-lib
-        src/AppComponent.hpp
-        src/SwaggerComponent.hpp
-        src/controller/UserController.hpp
-        src/db/Database.cpp
-        src/db/Database.hpp
-        src/db/model/User.hpp
-        src/dto/UserDto.hpp
-)
-
-add_dependencies(gridiron-oatpp-lib gridiron)
-
-## include directories
-
-target_include_directories(gridiron-oatpp-lib
-    PUBLIC
-        src
-)
-
-
-## link libs
-
-
-target_link_libraries(gridiron-oatpp-lib
-    PUBLIC oatpp::oatpp
-    PUBLIC oatpp::oatpp-test
-    PUBLIC oatpp::oatpp-swagger
-    gridiron
-    gridironControls
-    gridironUserControls
-)
-
-## define path to swagger-ui res folder
-
-add_definitions(-DOATPP_SWAGGER_RES_PATH="${OATPP_BASE_DIR}/bin/oatpp-swagger/res")
-
-## add executables
-
-add_executable(crud-exe src/App.cpp)
-add_dependencies(crud-exe gridiron-oatpp-lib)
-target_link_libraries(crud-exe gridiron-oatpp-lib)
-
-add_executable(crud-test test/tests.cpp)
-target_link_libraries(crud-test gridiron-oatpp-lib)
-
-enable_testing()
-add_test(project-tests crud-test)
+add_subdirectory(src)

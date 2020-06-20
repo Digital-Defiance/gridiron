@@ -1,1 +1,1 @@
-add_subdirectory(crud-exe)
+add_subdirectory(gridiron-demo)

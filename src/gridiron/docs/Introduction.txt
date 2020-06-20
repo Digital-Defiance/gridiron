@@ -1,7 +1,7 @@
 Introduction
 ------------
 
-GridIron is an event-driven C++ Apache/CGI Applications framework based on GNU CGICC, Boost and htmlcc. It features inheritable page and control classes and comes with an increasing set of controls.
+GridIron is C++ "Code-Beside" Web Applications framework based on Oat++ and htmlcxx2. It features inheritable page and control classes and comes with an increasing set of controls.
 
 When the decision was made to create GridIron, it was in spite of a couple of existing C++ frameworks. Most, if not all, of the frameworks require all of the page rendering to be done in C++. It can be frustrating when creating pages because everything that generated the pages had to happen in C++, resulting in hard to read code and unnecessary bloat.
 

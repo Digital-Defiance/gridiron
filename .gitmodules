@@ -1,0 +1,9 @@
+[submodule "src/htmlcxx"]
+	path = src/htmlcxx2
+	url = git@github.com:ProjectGridiron/htmlcxx.git
+[submodule "src/fmt"]
+	path = src/fmt
+	url = git@github.com:fmtlib/fmt.git
+[submodule "src/byuu-nall"]
+	path = src/byuu-nall
+	url = git@github.com:jessica-mulein/byuu-nall.git
