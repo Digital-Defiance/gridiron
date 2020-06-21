@@ -28,7 +28,7 @@
 #include <fstream>
 
 #include <gridiron/controls/Page.hpp>
-#include <gridiron/AttributeMappedProperty.hpp>
+#include <gridiron/properties/AttributeMappedProperty.hpp>
 
 namespace GridIron {
     namespace Controls {

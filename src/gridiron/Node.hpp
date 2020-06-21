@@ -4,17 +4,24 @@
 #include <htmlcxx2/htmlcxx2_html.hpp>
 #include <htmlcxx2/kp_tree.hh>
 
-#include <gridiron/properties.hpp>
-
 namespace GridIron {
+    namespace Properties {
+        class AttributeMappedProperty;
+        class ContentMappedProperty;
+        class ComparedAttributeProperty;
+    }
+
     class Node : public htmlcxx2::HTML::Node {
+        friend GridIron::Properties::AttributeMappedProperty;
+        friend GridIron::Properties::ContentMappedProperty;
+        friend GridIron::Properties::ComparedAttributeProperty;
     public:
-        /**
-         * Expose the protected addAttribute, returns whether call succeeded
-         * @param key
-         * @param value
-         * @return
-         */
+            /**
+             * Expose the protected addAttribute, returns whether call succeeded
+             * @param key
+             * @param value
+             * @return
+             */
         inline bool newAttribute(const std::string &key, const std::string &value) {
             if (this->hasAttribute(key)) {
                 return false;
@@ -22,6 +29,12 @@ namespace GridIron {
             // call parent
             htmlcxx2::HTML::Node::addAttribute(key, value);
             return true;
+        }
+
+        inline const std::string getAttribute(const std::string &key) const {
+            std::string value;
+            attribute(key, value);
+            return value;
         }
 
         inline bool updateAttribute(const std::string &key, const std::string &value) {

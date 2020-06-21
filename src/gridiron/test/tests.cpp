@@ -17,7 +17,7 @@ namespace GridIron {
 }
 
 int main() {
-    std::cout << GridIron::Page("gridiron-demo/testapp.html") << std::endl;
+    std::cout << GridIron::Controls::Page("gridiron-demo/testapp.html") << std::endl;
 
     return 0;
 }

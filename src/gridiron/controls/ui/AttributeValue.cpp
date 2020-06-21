@@ -15,7 +15,7 @@ namespace GridIron {
             // Declare an instance of the proxy to register the
             // existence of Label with the ControlFactory
             // !! only do this for classes that support autos !!
-            static GridIron::ControlFactoryProxy<GridIron::Controls::UI::AttributeValue> globalAttributeValueProxy;
+            static GridIron::Controls::ControlFactoryProxy<GridIron::Controls::UI::AttributeValue> globalAttributeValueProxy;
         }
     }
 }

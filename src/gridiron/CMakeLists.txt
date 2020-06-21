@@ -6,9 +6,12 @@ set(GRIDIRON_SOURCES
     ${GRIDIRON_SOURCE_ROOT}/Node.hpp
     ${GRIDIRON_SOURCE_ROOT}/ParserDom.hpp
     ${GRIDIRON_INCLUDE_ROOT}/properties.hpp
-    ${GRIDIRON_SOURCE_ROOT}/AttributeMappedProperty.hpp
-    ${GRIDIRON_SOURCE_ROOT}/ContentMappedProperty.hpp
-    ${GRIDIRON_SOURCE_ROOT}/ComparedAttributeProperty.hpp
+    ${GRIDIRON_SOURCE_ROOT}/properties/Property.hpp
+    ${GRIDIRON_SOURCE_ROOT}/properties/AttributeMappedProperty.hpp
+    ${GRIDIRON_SOURCE_ROOT}/properties/ContentMappedProperty.hpp
+    ${GRIDIRON_SOURCE_ROOT}/properties/ComparedAttributeProperty.hpp
+    ${GRIDIRON_SOURCE_ROOT}/properties/CompareProperty.hpp
+    ${GRIDIRON_SOURCE_ROOT}/properties/ReadOnlyProperty.hpp
 ${GRIDIRON_CONTROL_SOURCES}
 )
 

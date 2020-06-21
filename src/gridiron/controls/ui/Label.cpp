@@ -74,7 +74,7 @@ namespace GridIron {
             // Declare an instance of the proxy to register the
             // existence of Label with the ControlFactory
             // !! only do this for classes that support autos !!
-            static GridIron::ControlFactoryProxy<GridIron::Controls::UI::Label> globalLabelProxy;
+            static GridIron::Controls::ControlFactoryProxy<GridIron::Controls::UI::Label> globalLabelProxy;
         }
     }
 }
