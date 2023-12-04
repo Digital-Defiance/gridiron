@@ -4,3 +4,5 @@ build:
 
 clean:
 	rm -rf /workspaces/gridiron/build
+
+rebuild: clean build
