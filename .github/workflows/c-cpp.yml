@@ -17,4 +17,4 @@ jobs:
     - name: prerequisites
       run: sudo apt-get install libhtmlcxx-dev
     - name: run-cmake
-      uses: lukka/run-cmake@v2.5
+      uses: lukka/run-cmake@v10.7

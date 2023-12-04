@@ -1,8 +1,9 @@
 # root CMakeLists.txt
 set(CMAKE_VERBOSE_MAKEFILE True)
-cmake_minimum_required(VERSION 3.15)
-cmake_policy(VERSION 3.15)
+cmake_minimum_required(VERSION 3.22)
+cmake_policy(VERSION 3.22)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+set(CMAKE_PREFIX_PATH "/usr/local")
 
 set(GRIDIRON_VERSION "0.1.10")
 set(GRIDIRON_VERSION_MAJOR "0")
@@ -19,9 +20,9 @@ project(gridiron
     DESCRIPTION "GridIron C++ framework"
 )
 find_package(HtmlCxx REQUIRED)
-find_package(oatpp          1.1.0 REQUIRED)
-#find_library(oatpp          1.1.0 REQUIRED)
-find_package(oatpp-swagger  1.1.0 REQUIRED)
+find_package(oatpp          1.3.0 REQUIRED)
+#find_library(oatpp          1.3.0 REQUIRED)
+find_package(oatpp-swagger  1.3.0 REQUIRED)
 
 include_directories(SYSTEM PUBLIC ${HTMLCXX_INCLUDE_DIRS})
 include_directories(SYSTEM PUBLIC ${oatpp_INCLUDE_DIRS})
