@@ -20,9 +20,8 @@ This project is using [oatpp](https://github.com/oatpp/oatpp) and [oatpp-swagger
 |- include/
 |   |
 |   |- gridiron/                         // GridIron header files
-|   |   |- base_classes/                 // GridIron headers for core classes
-|   |       |- controls/                 // GridIron headers for custom controls
-|   |           |- ui/                   // GridIron headers for custom ui controls
+|   |   |- controls/                 // GridIron headers for custom controls
+|   |       |- ui/                   // GridIron headers for custom ui controls
 | 
 |- src/
 |   |
@@ -31,9 +30,8 @@ This project is using [oatpp](https://github.com/oatpp/oatpp) and [oatpp-swagger
 |   |- dto/                              // DTOs are declared here
 |   |- gridiron/                         // GridIron library root
 |   |    |- html/                        // GridIron HTML root for C++ pages
-|   |        |- base_classes/            // GridIron core library
-|   |            |- controls/            // GridIron Custom controls root
-|   |                |- ui/              // UI controls eg <gi:label>
+|   |        |- controls/            // GridIron Custom controls root
+|   |            |- ui/              // UI controls eg <gi:label>
 |   |- SwaggerComponent.hpp              // Swagger-UI config
 |   |- AppComponent.hpp                  // Service config
 |   |- App.cpp                           // main() is here

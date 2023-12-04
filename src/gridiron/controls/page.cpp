@@ -26,17 +26,25 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include <typeinfo>
-#include <gridiron/base_classes/page.hpp>
+#include <gridiron/controls/page.hpp>
 #include <gridiron/gridiron.hpp>
 #include <gridiron/exceptions.hpp>
 
 using namespace GridIron;
 
-static const std::string Page::Namespace = GRIDIRON_XHTML_NS;
-static const std::string Page::ControlTag = "Page";
+std::string Page::controlTagName() const
+{
+    return "Page";
+}
 
-Page::Page(std::string frontPageFile) : Control(frontPageFile, NULL) : _renderTag{"html"}
+std::string Page::renderTagName() const
+{
+    return "html";
+}
+
+Page::Page(std::string frontPageFile) : Control(frontPageFile.c_str(), nullptr)
 {
     int filesize = 0;
     int bytesread = 0;
@@ -49,9 +57,9 @@ Page::Page(std::string frontPageFile) : Control(frontPageFile, NULL) : _renderTa
         _htmlFile = std::string("::memory:" + addressof(this));
 
     // make up an id until we parse and match up with one
-    _id = std::string(getNamespace() + "::Page" + _htmlFile); // default id = "_Page_" or "_Page_foobar.html"
-    _viewStateEnabled = false;                                // whether to output the viewstate
-    _autonomous = Page::AllowAutonomous();                    // not applicable, page classes cannot be autonomous
+    _id = std::string(HtmlNamespace + "::Page" + _htmlFile); // default id = "_Page_" or "_Page_foobar.html"
+    _viewStateEnabled = false;                               // whether to output the viewstate
+    _autonomous = Page::AllowAutonomous();                   // not applicable, page classes cannot be autonomous
 
     if (frontPageFile.empty())
     {
@@ -61,7 +69,7 @@ Page::Page(std::string frontPageFile) : Control(frontPageFile, NULL) : _renderTa
     }
 
     // open the front-page
-    const std::string fullPagePath = GridIron::pathToPage(frontPage);
+    const std::string fullPagePath = GridIron::PathToPage(frontPage);
     std::ifstream file(fullPagePath, std::ios_base::in);
     if (!file.is_open())
         throw GridException(101, std::string("unable to open front-end page: ").append(fullPagePath).c_str());
@@ -127,15 +135,10 @@ Page::~Page()
 {
 }
 
-std::string Page::pathToPage(std::string frontPage)
+const std::string Page::PathToPage(std::string frontPage)
 {
     std::filesystem::path basePath = std::filesystem::current_path();
     return basePath.append(GRIDIRON_HTML_DOCROOT).append(frontPage);
-}
-
-std::string Page::pathToPage()
-{
-    return this;
 }
 
 // TODO: all the std::cerr's are either debug printing or need to be converted to throws
@@ -179,113 +182,106 @@ Page::fromHtmlNode(htmlnode &node)
         // and it's one we're supposed to interpret:
         if (it->isTag())
         {
-            std::pair<std::string, std::string> frameworkTag = GridIron::gridironParseTag(it->tagName());
-            if (!frameworkTag.first.empty())
+            std::string tagType = getGridIronCustomControlName(it->tagName());
+            if (!tagType.empty())
             {
                 // get the full Tag string
                 std::string tagData = it->text();
 
-                if (tagType.empty())
+                // use the htmlcxx parsing routine to get all of the attributes and values
+                it->parseAttributes();
+
+                // the first part of the result pair indicates whether the attribute was found
+                // the second has the actual id, if present
+                std::pair<bool, std::string> idresult = it->attribute("id");
+                if (!idresult.first)
                 {
-                    std::cerr << "ERROR: Control Tag is missing control type" << std::endl;
+                    std::cerr << "ERROR: Control Tag is missing id" << std::endl;
                 }
                 else
                 {
-                    // use the htmlcxx parsing routine to get all of the attributes and values
-                    it->parseAttributes();
+                    // same story here, bool will be true if Tag contained auto
+                    std::pair<bool, std::string> autoresult = it->attribute("auto");
+                    bool isauto = (autoresult.first && (autoresult.second == "true"));
 
-                    // the first part of the result pair indicates whether the attribute was found
-                    // the second has the actual id, if present
-                    std::pair<bool, std::string> idresult = it->attribute("id");
-                    if (!idresult.first)
+                    // look for any controls on the page with specified ID
+                    Control *instance = FindByID(idresult.second);
+
+                    // if we found an auto Tag and it's the first pass, and the id was already registered (earlier in the while loop, by another Tag)
+                    if ((instance != NULL) && isauto && firstpass)
                     {
-                        std::cerr << "ERROR: Control Tag is missing id" << std::endl;
+                        std::cerr << "found auto Tag (" << tagData
+                                  << ") and the specified ID was already in use by a control of type "
+                                  << instance->fullName() << std::endl;
+
+                        // if we found a standard Tag, the id was registered (as it should be, by the client code) and it's not the first pass
                     }
-                    else
+                    else if ((instance != NULL) && !isauto && !firstpass)
                     {
-                        // same story here, bool will be true if Tag contained auto
-                        std::pair<bool, std::string> autoresult = it->attribute("auto");
-                        bool isauto = (autoresult.first && (autoresult.second == "true"));
+                        std::cerr << "found Tag (" << tagData << ") and instance with type " << instance->fullName()
+                                  << ", id=" << idresult.second << std::endl;
 
-                        // look for any controls on the page with specified ID
-                        Control *instance = FindByID(idresult.second);
-
-                        // if we found an auto Tag and it's the first pass, and the id was already registered (earlier in the while loop, by another Tag)
-                        if ((instance != NULL) && isauto && firstpass)
+                        // make sure the instance with that ID is the same type as the control Tag
+                        if (!(Control::instanceOf<Control>(instance)))
                         {
-                            std::cerr << "found auto Tag (" << tagData
-                                      << ") and the specified ID was already in use by a control of type "
-                                      << instance->fullName() << std::endl;
-
-                            // if we found a standard Tag, the id was registered (as it should be, by the client code) and it's not the first pass
+                            std::cerr << "ERROR: instance with that id is not a " << tagType << std::endl;
                         }
-                        else if ((instance != NULL) && !isauto && !firstpass)
+                        else
                         {
-                            std::cerr << "found Tag (" << tagData << ") and instance with type " << instance->fullName()
-                                      << ", id=" << idresult.second << std::endl;
-
-                            // make sure the instance with that ID is the same type as the control Tag
-                            if (!(Control::instanceOf<Control>(instance)))
+                            // if it's the right type and id, but it already has an html node associated, we've already seen this Tag in the file- duplicate
+                            if (instance->HTMLNodeRegistered())
                             {
-                                std::cerr << "ERROR: instance with that id is not a " << tagType << std::endl;
+                                std::cerr << "Control instance already bound to another Tag." << std::endl;
+
+                                // otherwise, we've found the instance that's supposed to match this Tag
                             }
                             else
                             {
-                                // if it's the right type and id, but it already has an html node associated, we've already seen this Tag in the file- duplicate
-                                if (instance->HTMLNodeRegistered())
-                                {
-                                    std::cerr << "Control instance already bound to another Tag." << std::endl;
-
-                                    // otherwise, we've found the instance that's supposed to match this Tag
-                                }
-                                else
-                                {
-                                    std::cerr << "Control Tag and instance match up." << std::endl;
-                                    // set the associated node pointer
-                                    instance->SetHTMLNode(&(*it));
-                                    // add to nodemap
-                                    _nodemap[&(*it)] = instance;
-                                    // count how many controls we found
-                                    controlcount++;
-                                }
-                            }
-
-                            // if we found an auto Tag on the first pass and no one is using the specified id (at this point instance is guaranteed == NULL, given the other two)
-                            // we've previously handled (instance != NULL, auto, firstpass) and (instance != NULL, !auto, !firstpass)
-                            // if auto and firstpass, instance has to be NULL- meaning the Tag's requested id is available
-                        }
-                        else if (isauto && firstpass)
-                        {
-                            std::cerr << "found auto Tag, specified ID is available" << std::endl;
-
-                            // try to create a control of this type. The control class must be registered with the factory.
-                            // only classes that support autos should register.
-                            instance = globalControlFactory.CreateByType(tagType.c_str(), idresult.second.c_str(),
-                                                                         (Control *)this);
-
-                            // If we get an instance, it worked, if it didn't tough luck.
-                            if (instance == NULL)
-                            {
-                                std::cerr << "unable to create autonomous control of type " << tagType << std::endl;
-                            }
-                            else
-                            {
-                                std::cerr << "autonomous Tag of type=" << tagType << ", id=" << idresult.second
-                                          << " was created." << std::endl;
+                                std::cerr << "Control Tag and instance match up." << std::endl;
                                 // set the associated node pointer
                                 instance->SetHTMLNode(&(*it));
                                 // add to nodemap
                                 _nodemap[&(*it)] = instance;
-                                // add to the count of registered controls
+                                // count how many controls we found
                                 controlcount++;
                             }
+                        }
 
-                            // if still auto Tag, by elimination, this isn't the first pass- we're not interested. No error here.
-                        }
-                        else if (isauto)
+                        // if we found an auto Tag on the first pass and no one is using the specified id (at this point instance is guaranteed == NULL, given the other two)
+                        // we've previously handled (instance != NULL, auto, firstpass) and (instance != NULL, !auto, !firstpass)
+                        // if auto and firstpass, instance has to be NULL- meaning the Tag's requested id is available
+                    }
+                    else if (isauto && firstpass)
+                    {
+                        std::cerr << "found auto Tag, specified ID is available" << std::endl;
+
+                        // try to create a control of this type. The control class must be registered with the factory.
+                        // only classes that support autos should register.
+                        instance = globalControlFactory.CreateByType(tagType.c_str(), idresult.second.c_str(),
+                                                                     (Control *)this);
+
+                        // If we get an instance, it worked, if it didn't tough luck.
+                        if (instance == NULL)
                         {
-                            std::cerr << "found auto Tag, skipping for second pass" << std::endl;
+                            std::cerr << "unable to create autonomous control of type " << tagType << std::endl;
                         }
+                        else
+                        {
+                            std::cerr << "autonomous Tag of type=" << tagType << ", id=" << idresult.second
+                                      << " was created." << std::endl;
+                            // set the associated node pointer
+                            instance->SetHTMLNode(&(*it));
+                            // add to nodemap
+                            _nodemap[&(*it)] = instance;
+                            // add to the count of registered controls
+                            controlcount++;
+                        }
+
+                        // if still auto Tag, by elimination, this isn't the first pass- we're not interested. No error here.
+                    }
+                    else if (isauto)
+                    {
+                        std::cerr << "found auto Tag, skipping for second pass" << std::endl;
                     }
                 }
             }

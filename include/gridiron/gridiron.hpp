@@ -28,7 +28,7 @@
 #include <htmlcxx/css/parser_pp.h>
 
 #ifndef GRIDIRON_XHTML_NS
-#error "Please add -DGRIDIRON_XHTML_NS=gi"
+#error "Please add -DGRIDIRON_XHTML_NS=GridIron"
 #endif
 
 #ifndef GRIDIRON_HTML_DOCROOT
@@ -37,6 +37,8 @@
 
 namespace GridIron
 {
+    extern const std::string HtmlNamespace;
+
     class Control;
 
     // htmlnode
@@ -44,6 +46,10 @@ namespace GridIron
 
     // parse/find control type in <GridIron::XType ...>
     std::pair<std::string, std::string> gridironParseTag(std::string tag);
+
+    std::string getGridIronCustomControlName(std::string tag);
+
+    bool isCustomControl(std::string tag);
 
     std::ostream &xmlEncode(std::string &data, std::ostream &os);
 

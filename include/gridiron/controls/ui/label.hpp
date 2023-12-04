@@ -69,6 +69,9 @@ namespace GridIron
 
             friend std::ostream &operator<<(std::ostream &os, Label &label);
 
+            std::string controlTagName() const override;
+            std::string renderTagName() const override;
+
         private:
             bool _defaulttext;
             std::string _text;

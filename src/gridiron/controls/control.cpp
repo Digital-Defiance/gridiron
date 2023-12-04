@@ -22,11 +22,12 @@
  * supplied by a Page class's parsing operation.
  ***************************************************************************************/
 
-#include <gridiron/base_classes/page.hpp>
-#include <gridiron/base_classes/controls/control.hpp>
+#include <gridiron/controls/page.hpp>
+#include <gridiron/controls/control.hpp>
 
 namespace GridIron
 {
+    const std::string Control::HtmlNamespace = GRIDIRON_XHTML_NS;
 
     Control::Control(const char *id, unique_control_ptr parent)
     {
@@ -44,8 +45,6 @@ namespace GridIron
         _autonomous = false;
         // this is a pointer to the html Tag associated with this instance
         _htmlNode = nullptr;
-        _controlTagName = "Control";
-        _renderTagName = "div"; // default to div
 
         // we must have an ID- and only one instance of an id may exist on all controls under a page object
         if (_id.length() == 0)
@@ -155,15 +154,18 @@ namespace GridIron
         return nullptr;
     }
 
-    std::ostream &Control::fullName(std::ostream &os)
+    static std::string GetFullName(std::string tag)
     {
-        os << this->getNamespace() << "::" << this->_controlTagName;
-        return os;
+        return (HtmlNamespace + "::" + tag);
     }
 
-    std::string Control::fullName()
+    std::string Control::fullName(){
+        return GetFullName(this->controlTagName())}
+
+    std::ostream &Control::fullName(std::ostream &os)
     {
-        return (this->getNamespace() + "::" + this->_controlTagName)
+        os << GetFullName(this->controlTagName());
+        return os;
     }
 
     // register this control with the parent

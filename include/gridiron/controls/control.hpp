@@ -55,8 +55,9 @@ namespace GridIron
     protected:
         Control(const char *id, unique_control_ptr parent); // parent can be page type or control type
     public:
-        static const std::string Namespace;      // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
-        static const std::string ControlTagName; // the associated codebeside tag name eg <namespace>::<tag>
+        static const std::string HtmlNamespace; // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
+
+        static std::string GetFullName(std::string tag);
 
         virtual ~Control(); // destructor
         unique_page_ptr
@@ -91,15 +92,8 @@ namespace GridIron
             return dynamic_cast<const Base *>(ptr) != nullptr;
         }
 
-        inline const std::string RenderTagName()
-        {
-            return _renderTagName;
-        }
-
-        inline void RenderTagName(std::string tagName)
-        {
-            _renderTagName = tagName; // eg "div"
-        }
+        virtual std::string controlTagName() const = 0; // the associated codebeside tag name eg <namespace>::<tag>
+        virtual std::string renderTagName() const = 0;  // the associated html tag name eg <div>
 
         static unique_control_ptr fromHtmlNode(htmlnode &node);
 
@@ -124,7 +118,6 @@ namespace GridIron
          */
         htmlnode *_htmlNode; // the associated html node
 
-        std::string _renderTagName; // tag name the control will ultimately be rendered as
         // memory overhead warning...
         static std::map<std::string, unique_control_ptr> _controlsByID;
         static std::map<Control *, unique_control_ptr> _controlsByControl;

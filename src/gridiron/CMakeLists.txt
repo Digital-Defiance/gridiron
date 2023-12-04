@@ -4,6 +4,7 @@ set(GRIDIRON_SOURCES
     ${GRIDIRON_SOURCE_ROOT}/gridiron.cpp
     ${GRIDIRON_INCLUDE_ROOT}/gridiron.hpp
     ${GRIDIRON_INCLUDE_ROOT}/tag.hpp
+    ${GRIDIRON_SOURCE_ROOT}/tag.cpp
 ${GRIDIRON_CONTROL_SOURCES}
 )
 

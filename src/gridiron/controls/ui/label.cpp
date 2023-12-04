@@ -24,14 +24,25 @@
  */
 
 #include <gridiron/exceptions.hpp>
-#include <gridiron/base_classes/page.hpp>
-#include <gridiron/base_classes/controls/ui/label.hpp>
-#include <gridiron/base_classes/tag.hpp>
+#include <gridiron/controls/control.hpp>
+#include <gridiron/controls/page.hpp>
+#include <gridiron/controls/ui/label.hpp>
+#include <gridiron/tag.hpp>
 
 using namespace GridIron;
 using namespace GridIron::controls;
 
-Label::Label(const char *id, unique_control_ptr parent) : Control(id)
+std::string Label::controlTagName() const
+{
+    return "Label";
+}
+
+std::string Label::renderTagName() const
+{
+    return "div";
+}
+
+Label::Label(const char *id, unique_control_ptr parent) : Control(id, parent)
 {
     // nothing extra
     _text = std::string("");

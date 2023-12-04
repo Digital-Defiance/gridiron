@@ -22,6 +22,8 @@
 
 namespace GridIron
 {
+    const std::string HtmlNamespace = GRIDIRON_XHTML_NS;
+
     // parse control type out of Tag
     std::pair<std::string, std::string> gridironParseTag(std::string tag)
     {
@@ -33,6 +35,22 @@ namespace GridIron
             return std::make_pair<std::string, std::string>(matches[0], matches[1]);
         }
         return std::make_pair<std::string, std::string>("", "");
+    }
+
+    std::string getGridIronCustomControlName(std::string tag)
+    {
+        auto parsedTag = GridIron::gridironParseTag(tag);
+        // check if the parsed tag is in the gridiron html namespace
+        if (!parsedTag.first.empty() && parsedTag.first == HtmlNamespace && !parsedTag.second.empty())
+        {
+            return parsedTag.second;
+        }
+        return "";
+    }
+
+    bool isCustomControl(std::string tag)
+    {
+        return !getGridIronCustomControlName(tag).empty();
     }
 
     std::ostream &xmlEncode(std::ostream &dest, std::istream &source)
