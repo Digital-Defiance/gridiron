@@ -7,7 +7,7 @@
  *
  * License
  *
- * This code is licensed under the GPLv3.
+ * This code is licensed under the Apache license.
  * Please see COPYING in the root of this package for details.
  *
  * The following libraries are only linked in, and no code is based directly from them:
