@@ -1,6 +1,7 @@
 /****************************************************************************************
- * (C) Copyright 2009-2020
- *    Jessica Mulein <jessica@mulein.com>
+ * (C) Copyright 2009-2023
+ *    Jessica Mulein <jessica@digitaldefiance.org>
+ *    Digital Defiance and Contributors <https://digitaldefiance.org>
  *
  * Others will be credited if more developers join.
  *
@@ -34,7 +35,8 @@
 #error "Please add -DGRIDIRON_HTML_DOCROOT=/path/to/gridiron/html"
 #endif
 
-namespace GridIron {
+namespace GridIron
+{
     class Control;
 
     // htmlnode

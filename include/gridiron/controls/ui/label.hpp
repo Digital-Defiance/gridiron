@@ -1,6 +1,7 @@
 /****************************************************************************************
- * (C) Copyright 2009-2020
- *    Jessica Mulein <jessica@mulein.com>
+ * (C) Copyright 2009-2023
+ *    Jessica Mulein <jessica@digitaldefiance.org>
+ *    Digital Defiance and Contributors <https://digitaldefiance.org>
  *
  * Others will be credited if more developers join.
  *
@@ -29,14 +30,17 @@
 #include <string>
 #include <fstream>
 
-namespace GridIron {
+namespace GridIron
+{
     class Control;
 
     class Page;
-    namespace controls {
+    namespace controls
+    {
         class Label;
 
-        class Label : public Control {
+        class Label : public Control
+        {
         public:
             Label(const char *id, unique_control_ptr parent);
 
@@ -44,10 +48,11 @@ namespace GridIron {
 
             ~Label();
 
-            inline void SetText(std::string value) {
+            inline void SetText(std::string value)
+            {
                 _text = value;
                 _defaulttext = false;
-            };    // set the text and mark it as changed
+            }; // set the text and mark it as changed
             inline std::string GetText() { return _text; };
 
             inline std::string *const GetTextPtr() { return &_text; };

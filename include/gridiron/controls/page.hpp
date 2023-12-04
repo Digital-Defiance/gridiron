@@ -1,6 +1,7 @@
 /****************************************************************************************
- * (C) Copyright 2009-2020
- *    Jessica Mulein <jessica@mulein.com>
+ * (C) Copyright 2009-2023
+ *    Jessica Mulein <jessica@digitaldefiance.org>
+ *    Digital Defiance and Contributors <https://digitaldefiance.org>
  *
  * Others will be credited if more developers join.
  *
@@ -36,7 +37,8 @@
 #include <fstream>
 #include <memory>
 
-namespace GridIron {
+namespace GridIron
+{
     class Page;
 
     class Control;
@@ -47,7 +49,8 @@ namespace GridIron {
     typedef std::map<const std::string, std::string *> var_map;
 
     // page classes are derived from control classes. They must have no parent (NULL).
-    class Page : public Control {
+    class Page : public Control
+    {
     public:
         Page(std::string frontPage);
 
@@ -58,19 +61,19 @@ namespace GridIron {
         friend std::ostream &operator<<(std::ostream &os, const Control &control);
 
         bool
-        RegisterVariable(const std::string name, std::string *data);    // register a variable for front-page access
-        inline static const bool AllowAutonomous() { return false; }        // can't have an autonomous page class
+        RegisterVariable(const std::string name, std::string *data); // register a variable for front-page access
+        inline static const bool AllowAutonomous() { return false; } // can't have an autonomous page class
 
         static const std::string PathToPage(std::string frontPage);
 
         static const std::string PathToPage();
 
     protected:
-        tree<htmlnode> _tree;        // html tree
-        var_map _regvars;            // registered variables for frontpage access
-        node_map _nodemap;            // registered nodes
-        std::string _htmlFile;        // front page filename
-        std::string _htmlFilepath;        // front page filename full path
+        tree<htmlnode> _tree;      // html tree
+        var_map _regvars;          // registered variables for frontpage access
+        node_map _nodemap;         // registered nodes
+        std::string _htmlFile;     // front page filename
+        std::string _htmlFilepath; // front page filename full path
     };
 }
 

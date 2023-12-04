@@ -1,6 +1,7 @@
 /****************************************************************************************
- * (C) Copyright 2009-2020
- *    Jessica Mulein <jessica@mulein.com>
+ * (C) Copyright 2009-2023
+ *    Jessica Mulein <jessica@digitaldefiance.org>
+ *    Digital Defiance and Contributors <https://digitaldefiance.org>
  *
  * Others will be credited if more developers join.
  *
@@ -30,33 +31,40 @@
 using namespace GridIron;
 using namespace GridIron::controls;
 
-Label::Label(const char *id, unique_control_ptr parent) : Control(id) {
+Label::Label(const char *id, unique_control_ptr parent) : Control(id)
+{
     // nothing extra
     _text = std::string("");
-    _defaulttext = true;        // text has not been overriden/changed
+    _defaulttext = true; // text has not been overriden/changed
 }
 
-Label::Label(const char *id, unique_control_ptr parent, const char *text) : Control(id, parent) {
+Label::Label(const char *id, unique_control_ptr parent, const char *text) : Control(id, parent)
+{
     // copy text
     _text = std::string(text);
-    _defaulttext = false;        // text has been overridden/changed
+    _defaulttext = false; // text has been overridden/changed
 }
 
-Label::~Label() {
+Label::~Label()
+{
 }
 
-Label*
-Label::fromHtmlNode(htmlnode &node) {
+Label *
+Label::fromHtmlNode(htmlnode &node)
+{
     unique_page_ptr _Page = GetPage();
-    if (_Page == nullptr) throw GridException(300, "Control must be attached to a page");
-    if (_htmlNode == nullptr) throw GridException(301, "HTML Tag not found for this instance");
+    if (_Page == nullptr)
+        throw GridException(300, "Control must be attached to a page");
+    if (_htmlNode == nullptr)
+        throw GridException(301, "HTML Tag not found for this instance");
 
     // if there are child nodes, that will be the text for the label, should not override any text that has already been set.
     // if _defaulttext == true, can override
     // a shortcut to the below might be to read the parsed sibling/child
 
     // only parse the original/default text if we need it (it hasn't been changed)
-    if (_defaulttext) {
+    if (_defaulttext)
+    {
 
         std::string starttag = _htmlNode->text();
         std::string endtag = _htmlNode->closingText();
@@ -67,14 +75,16 @@ Label::fromHtmlNode(htmlnode &node) {
 
     // if we're an autonomous Tag, automatically register the text string for access
     // otherwise client will have to manually register if they want it accessible
-    if (_autonomous) _Page->RegisterVariable(_id + ".Text", &_text);
+    if (_autonomous)
+        _Page->RegisterVariable(_id + ".Text", &_text);
 }
 
-std::ostream& operator<<(std::ostream& os, Label& label) {
+std::ostream &operator<<(std::ostream &os, Label &label)
+{
     label.parse();
     htmlcxx::HTML::Node n;
-    const char* foo = "<div style=\"align: left;\">" + _text.c_str() + "</div>";
-//    return oatpp::String(foo);
+    const char *foo = "<div style=\"align: left;\">" + _text.c_str() + "</div>";
+    //    return oatpp::String(foo);
 
     return os;
 }

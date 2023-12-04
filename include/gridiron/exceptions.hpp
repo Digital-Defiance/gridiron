@@ -1,6 +1,7 @@
 /****************************************************************************************
- * (C) Copyright 2009-2020
- *    Jessica Mulein <jessica@mulein.com>
+ * (C) Copyright 2009-2023
+ *    Jessica Mulein <jessica@digitaldefiance.org>
+ *    Digital Defiance and Contributors <https://digitaldefiance.org>
  *
  * Others will be credited if more developers join.
  *
@@ -18,11 +19,14 @@
 
 #include <string>
 
-namespace GridIron {
+namespace GridIron
+{
     // simple exception class to hold an id and description- likely to be replaced...
-    class GridException {
+    class GridException
+    {
     public:
-        inline GridException(int id, const char *text) {
+        inline GridException(int id, const char *text)
+        {
             _id = id;
             _string = std::string(text);
         };
@@ -30,6 +34,7 @@ namespace GridIron {
         inline const int id() const { return _id; };
 
         inline const char *string() const { return _string.c_str(); };
+
     private:
         int _id;
         std::string _string;

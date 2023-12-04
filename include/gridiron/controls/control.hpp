@@ -1,6 +1,7 @@
 /****************************************************************************************
- * (C) Copyright 2009-2020
- *    Jessica Mulein <jessica@mulein.com>
+ * (C) Copyright 2009-2023
+ *    Jessica Mulein <jessica@digitaldefiance.org>
+ *    Digital Defiance and Contributors <https://digitaldefiance.org>
  *
  * Others will be credited if more developers join.
  *
@@ -34,7 +35,8 @@
 #include <map>
 #include <memory>
 
-namespace GridIron {
+namespace GridIron
+{
     class Page;
 
     class Control;
@@ -48,24 +50,25 @@ namespace GridIron {
     typedef std::vector<unique_control_ptr> vector_control_children;
 
     // custom control base class, must derive
-    class Control {
+    class Control
+    {
     protected:
-        Control(const char *id, unique_control_ptr parent);                // parent can be page type or control type
+        Control(const char *id, unique_control_ptr parent); // parent can be page type or control type
     public:
-        static const std::string Namespace;         // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
-        static const std::string ControlTagName;    // the associated codebeside tag name eg <namespace>::<tag>
+        static const std::string Namespace;      // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
+        static const std::string ControlTagName; // the associated codebeside tag name eg <namespace>::<tag>
 
-        virtual ~Control();                                    // destructor
+        virtual ~Control(); // destructor
         unique_page_ptr
-        GetPage();                                        // return pointer to parent page object (or self for page)
+        GetPage(); // return pointer to parent page object (or self for page)
         unique_control_ptr
-        GetRoot();                                    // return pointer to the parent control object, regardless of type.
+        GetRoot(); // return pointer to the parent control object, regardless of type.
         unique_control_ptr This();
 
         unique_control_ptr Find(Control &control);
 
         unique_control_ptr FindByID(const std::string id,
-                                    bool searchParentsIfNotChild = false);                    // find by id, starting with the current instance
+                                    bool searchParentsIfNotChild = false); // find by id, starting with the current instance
         std::ostream &fullName(std::ostream &os);
 
         std::string fullName();
@@ -77,48 +80,51 @@ namespace GridIron {
         inline bool HTMLNodeRegistered() { return (this->_htmlNode != NULL); };
 
         void SetAutonomous(
-                bool isauto);                                    // set whether the control is in html only (no C++ instance pre-programmed)
+            bool isauto); // set whether the control is in html only (no C++ instance pre-programmed)
         inline virtual bool IsAutonomous(
-                bool isauto) { return this->_autonomous; };    // whether the control is in html only (no C++ instance pre-programmed)
-        inline const std::string ID() { return this->_id; };                // return our ID
+            bool isauto) { return this->_autonomous; };      // whether the control is in html only (no C++ instance pre-programmed)
+        inline const std::string ID() { return this->_id; }; // return our ID
 
-        template<typename Base, typename T>
-        static inline bool instanceOf(const T *ptr) {
+        template <typename Base, typename T>
+        static inline bool instanceOf(const T *ptr)
+        {
             return dynamic_cast<const Base *>(ptr) != nullptr;
         }
 
-        inline const std::string RenderTagName() {
+        inline const std::string RenderTagName()
+        {
             return _renderTagName;
         }
 
-        inline void RenderTagName(std::string tagName) {
+        inline void RenderTagName(std::string tagName)
+        {
             _renderTagName = tagName; // eg "div"
         }
 
         static unique_control_ptr fromHtmlNode(htmlnode &node);
 
     protected:
-        inline static const bool AllowAutonomous() { return false; }        // can't have a base class anyway
+        inline static const bool AllowAutonomous() { return false; } // can't have a base class anyway
         virtual bool
-        registerChild(std::string id, Control *control);    // add child control's id and name to the bimap
+        registerChild(std::string id, Control *control); // add child control's id and name to the bimap
         virtual bool
-        unregister_child(std::string &id);                    // delete child control's id and name from the bimap
+        unregister_child(std::string &id); // delete child control's id and name from the bimap
 
-        std::string _id;                            // our id
-        vector_control_children _children;                        // collection of pointers to child controls, by their address
-        unique_control_ptr _parent;                            // parent's pointer
-        std::string _parsed;                        // data after parsing- only data relevant to our id
-        bool _viewStateEnabled = false;                    // whether to bother serializing this object
-        bool _viewStateValid = false;                       // whether viewstate was authenticated
-        bool _autonomous = false;                            // control does not have a pre-programmed instance, instantiated from the HTML
+        std::string _id;                   // our id
+        vector_control_children _children; // collection of pointers to child controls, by their address
+        unique_control_ptr _parent;        // parent's pointer
+        std::string _parsed;               // data after parsing- only data relevant to our id
+        bool _viewStateEnabled = false;    // whether to bother serializing this object
+        bool _viewStateValid = false;      // whether viewstate was authenticated
+        bool _autonomous = false;          // control does not have a pre-programmed instance, instantiated from the HTML
 
         /* These vars correspond to whether (and where) the C++ instance has been matched to an HTML instance (and only one)
          * Multiple detections of HTML tags with the same ID should cause an error, regardless of type
          * Similarly, the page should only be able to contain one control of a given ID
          */
-        htmlnode *_htmlNode;                    // the associated html node
+        htmlnode *_htmlNode; // the associated html node
 
-        std::string _renderTagName;                 // tag name the control will ultimately be rendered as
+        std::string _renderTagName; // tag name the control will ultimately be rendered as
         // memory overhead warning...
         static std::map<std::string, unique_control_ptr> _controlsByID;
         static std::map<Control *, unique_control_ptr> _controlsByControl;
@@ -136,7 +142,8 @@ namespace GridIron {
 
     // definition for our class in charge of registering, finding, and instantiating control classes
     // by their type
-    class ControlFactory {
+    class ControlFactory
+    {
     public:
         ControlFactory();
 
@@ -161,9 +168,11 @@ namespace GridIron {
 
     // each proxy, when instantiated by the derived control class will register it self with the
     // control factory. This will be derived by the template class that follows.
-    class ControlFactoryProxyBase {
+    class ControlFactoryProxyBase
+    {
     public:
-        inline ControlFactoryProxyBase() {
+        inline ControlFactoryProxyBase()
+        {
             globalControlFactory.Register(this);
         }
 
@@ -171,12 +180,16 @@ namespace GridIron {
     };
 
     // instantiate one of these in the .cpp file of every derived control class you want autos for
-    template<class T>
-    class ControlFactoryProxy : public ControlFactoryProxyBase {
-        inline virtual Control *CreateObject(const char *id, Control *parent) const {
-            if (!T::AllowAutonomous()) return NULL;
+    template <class T>
+    class ControlFactoryProxy : public ControlFactoryProxyBase
+    {
+        inline virtual Control *CreateObject(const char *id, Control *parent) const
+        {
+            if (!T::AllowAutonomous())
+                return NULL;
             Control *pointer = new T(id, parent);
-            if (pointer == NULL) return NULL;
+            if (pointer == NULL)
+                return NULL;
             pointer->Control::SetAutonomous(true);
             return pointer;
         }
