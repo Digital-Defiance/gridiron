@@ -13,7 +13,7 @@
  * The following libraries are only linked in, and no code is based directly from them:
  * htmlcxx is under the Apache 2.0 License
  ***************************************************************************************
- * gridiron::Label custom control class
+ * GridIron::Label custom control class
  * ------------------------------------
  *
  * Store a text value, render it as a div

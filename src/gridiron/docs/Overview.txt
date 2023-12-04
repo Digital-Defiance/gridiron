@@ -23,7 +23,7 @@ Template Tag Replacement - Principle Types
 
 Variable Tags
 ----------------------------
-<%=variable%>
+<GridIron::Value key="variable" />
 
 These tags will be directly replaced with the string contained in the
 variable referenced at render time. Variable names are alphanumeric and
@@ -35,12 +35,12 @@ In a large page, this may add up.
 
 Control Tags (also see ControlTags.txt)
 ----------------------------
-<gridiron::Type id="myid">contents/children/text/data</gridiron::Type>
+<GridIron::Type id="myid">contents/children/text/data</GridIron::Type>
 or
-<gridiron::Type id="myid" />
+<GridIron::Type id="myid" />
 
 for example:
-<gridiron::Label id="lbl1234">these are the contents</gridiron::Label>
+<GridIron::Label id="lbl1234">these are the contents</GridIron::Label>
 
 Control tags must correspond with a control instance of the correct type and
 ID, except in the case of autonomous tags, described shortly.
@@ -63,8 +63,8 @@ attribute auto="true" (setting auto="false" has no effect).
 
 For example, in the case of an autonomous label Tag, it will register id_Text
 for access.
-<gridiron::Label id="lblAuto1234" auto="true">default text</gridiron::Label>
-<br><%=lblAuto1234%>
+<GridIron::Label id="lblAuto1234" auto="true">default text</GridIron::Label>
+<br><GridIron::Value key="lblAuto1234" />
 
 will render to:
 default text

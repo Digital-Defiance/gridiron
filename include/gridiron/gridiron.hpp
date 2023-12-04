@@ -42,7 +42,7 @@ namespace GridIron
     // htmlnode
     typedef htmlcxx::HTML::Node htmlnode;
 
-    // parse/find control type in <gridiron::XType ...>
+    // parse/find control type in <GridIron::XType ...>
     std::pair<std::string, std::string> gridironParseTag(std::string tag);
 
     std::ostream &xmlEncode(std::string &data, std::ostream &os);
