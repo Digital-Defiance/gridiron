@@ -47,13 +47,13 @@ namespace GridIron
     typedef std::unique_ptr<Control> unique_control_ptr;
     typedef std::unique_ptr<Page> unique_page_ptr;
     typedef std::map<std::string, unique_control_ptr> control_map;
-    typedef std::vector<unique_control_ptr> vector_control_children;
+    typedef std::vector<std::shared_ptr<Control>> vector_control_children;
 
     // custom control base class, must derive
     class Control
     {
     protected:
-        Control(const char *id, unique_control_ptr parent); // parent can be page type or control type
+        Control(const char *id, std::shared_ptr<Control> parent, std::string type); // parent can be page type or control type
     public:
         static const std::string HtmlNamespace; // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
 
@@ -66,10 +66,10 @@ namespace GridIron
         GetRoot(); // return pointer to the parent control object, regardless of type.
         unique_control_ptr This();
 
-        unique_control_ptr Find(Control &control);
+        std::shared_ptr<Control> Find(Control &control);
 
-        unique_control_ptr FindByID(const std::string id,
-                                    bool searchParentsIfNotChild = false); // find by id, starting with the current instance
+        std::shared_ptr<Control> FindByID(const std::string &id,
+                                          bool searchParentsIfNotChild = false); // find by id, starting with the current instance
         std::ostream &fullName(std::ostream &os);
 
         std::string fullName();
@@ -95,7 +95,7 @@ namespace GridIron
         virtual std::string controlTagName() const = 0; // the associated codebeside tag name eg <namespace>::<tag>
         virtual std::string renderTagName() const = 0;  // the associated html tag name eg <div>
 
-        static unique_control_ptr fromHtmlNode(htmlnode &node);
+        static std::shared_ptr<Control> fromHtmlNode(htmlnode &node);
 
     protected:
         inline static const bool AllowAutonomous() { return false; } // can't have a base class anyway
@@ -106,7 +106,7 @@ namespace GridIron
 
         std::string _id;                   // our id
         vector_control_children _children; // collection of pointers to child controls, by their address
-        unique_control_ptr _parent;        // parent's pointer
+        std::shared_ptr<Control> _parent;  // parent's pointer
         std::string _parsed;               // data after parsing- only data relevant to our id
         bool _viewStateEnabled = false;    // whether to bother serializing this object
         bool _viewStateValid = false;      // whether viewstate was authenticated
@@ -117,12 +117,14 @@ namespace GridIron
          * Similarly, the page should only be able to contain one control of a given ID
          */
         htmlnode *_htmlNode; // the associated html node
+        std::string _text;
+        std::string _type;
 
         // memory overhead warning...
-        static std::map<std::string, unique_control_ptr> _controlsByID;
-        static std::map<Control *, unique_control_ptr> _controlsByControl;
-        static std::map<std::string, unique_control_ptr> _controlsByNamespace;
-        static std::map<std::string, unique_control_ptr> _controlsByControlTag;
+        static std::map<std::string, std::shared_ptr<Control>> _controlsByID;
+        static std::map<Control *, std::shared_ptr<Control>> _controlsByControl;
+        static std::map<std::string, std::shared_ptr<Control>> _controlsByNamespace;
+        static std::map<std::string, std::shared_ptr<Control>> _controlsByControlTag;
         static std::set<std::string> _registeredNamespaces;
     };
 
@@ -169,22 +171,27 @@ namespace GridIron
             globalControlFactory.Register(this);
         }
 
-        virtual Control *CreateObject(const char *id, Control *parent) const = 0;
+        virtual Control *CreateObject(const char *id, Control *parent, std::string type) const = 0;
+        virtual const char *GetType() const = 0;
     };
 
     // instantiate one of these in the .cpp file of every derived control class you want autos for
     template <class T>
     class ControlFactoryProxy : public ControlFactoryProxyBase
     {
-        inline virtual Control *CreateObject(const char *id, Control *parent) const
+        inline virtual Control *CreateObject(const char *id, Control *parent, std::string type) const
         {
             if (!T::AllowAutonomous())
                 return NULL;
-            Control *pointer = new T(id, parent);
+            Control *pointer = new T(id, parent, type);
             if (pointer == NULL)
                 return NULL;
             pointer->Control::SetAutonomous(true);
             return pointer;
+        }
+        inline virtual const char *GetType() const
+        {
+            return T::Type();
         }
     };
 }
