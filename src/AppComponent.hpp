@@ -2,16 +2,11 @@
 #ifndef AppComponent_hpp
 #define AppComponent_hpp
 
-#include "db/Database.hpp"
-
-#include "SwaggerComponent.hpp"
-
-#include "oatpp/web/server/HttpConnectionHandler.hpp"
+#include "oatpp/web/server/AsyncHttpConnectionHandler.hpp"
 #include "oatpp/web/server/HttpRouter.hpp"
-#include "oatpp/network/server/SimpleTCPConnectionProvider.hpp"
+#include "oatpp/network/tcp/server/ConnectionProvider.hpp"
 
-#include "oatpp/parser/json/mapping/Serializer.hpp"
-#include "oatpp/parser/json/mapping/Deserializer.hpp"
+#include "oatpp/parser/json/mapping/ObjectMapper.hpp"
 
 #include "oatpp/core/macro/component.hpp"
 
@@ -21,17 +16,24 @@
  */
 class AppComponent {
 public:
-  
+
   /**
-   *  Swagger component
+   * Create Async Executor
    */
-  SwaggerComponent swaggerComponent;
-  
+  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::async::Executor>, executor)([] {
+    return std::make_shared<oatpp::async::Executor>(
+      9 /* Data-Processing threads */,
+      2 /* I/O threads */,
+      1 /* Timer threads */
+    );
+  }());
+
   /**
    *  Create ConnectionProvider component which listens on the port
    */
   OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::ServerConnectionProvider>, serverConnectionProvider)([] {
-    return oatpp::network::server::SimpleTCPConnectionProvider::createShared(8000);
+    /* non_blocking connections should be used with AsyncHttpConnectionHandler for AsyncIO */
+    return oatpp::network::tcp::server::ConnectionProvider::createShared({"0.0.0.0", 8000, oatpp::network::Address::IP_4});
   }());
   
   /**
@@ -44,25 +46,21 @@ public:
   /**
    *  Create ConnectionHandler component which uses Router component to route requests
    */
-  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::server::ConnectionHandler>, serverConnectionHandler)([] {
+  OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::network::ConnectionHandler>, serverConnectionHandler)([] {
     OATPP_COMPONENT(std::shared_ptr<oatpp::web::server::HttpRouter>, router); // get Router component
-    return oatpp::web::server::HttpConnectionHandler::createShared(router);
+    OATPP_COMPONENT(std::shared_ptr<oatpp::async::Executor>, executor); // get Async executor component
+    return oatpp::web::server::AsyncHttpConnectionHandler::createShared(router, executor);
   }());
   
   /**
    *  Create ObjectMapper component to serialize/deserialize DTOs in Contoller's API
    */
   OATPP_CREATE_COMPONENT(std::shared_ptr<oatpp::data::mapping::ObjectMapper>, apiObjectMapper)([] {
-    auto objectMapper = oatpp::parser::json::mapping::ObjectMapper::createShared();
-    objectMapper->getDeserializer()->getConfig()->allowUnknownFields = false;
+    auto serializerConfig = oatpp::parser::json::mapping::Serializer::Config::createShared();
+    auto deserializerConfig = oatpp::parser::json::mapping::Deserializer::Config::createShared();
+    deserializerConfig->allowUnknownFields = false;
+    auto objectMapper = oatpp::parser::json::mapping::ObjectMapper::createShared(serializerConfig, deserializerConfig);
     return objectMapper;
-  }());
-  
-  /**
-   *  Create Demo-Database component which stores information about users
-   */
-  OATPP_CREATE_COMPONENT(std::shared_ptr<Database>, database)([] {
-    return std::make_shared<Database>();
   }());
 
 };
