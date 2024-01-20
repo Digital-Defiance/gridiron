@@ -126,7 +126,7 @@ Page::Page(std::string frontPageFile) : Control(frontPageFile.c_str(), nullptr)
     //_regvars["__namespace"] = &_namespace;
 }
 
-unique_page_ptr Page::This()
+std::unique_ptr<Page> Page::This()
 {
     return std::unique_ptr<Page>(this);
 }
@@ -343,6 +343,7 @@ std::ostream &operator<<(std::ostream &os, const Control &control)
     // assemble page: start by rendering the first node.
     tree<htmlnode>::sibling_iterator sib = _tree.begin();
     renderNode(&sib, 1, data);
+    return os;
 }
 
 // for controls to make variables available for HTML replacement. alphanumeric and _ only.

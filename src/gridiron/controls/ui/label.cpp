@@ -42,14 +42,14 @@ std::string Label::renderTagName() const
     return "div";
 }
 
-Label::Label(const char *id, unique_control_ptr parent) : Control(id, parent)
+Label::Label(const char *id, std::unique_ptr<Control> parent) : Control(id, parent)
 {
     // nothing extra
     _text = std::string("");
     _defaulttext = true; // text has not been overriden/changed
 }
 
-Label::Label(const char *id, unique_control_ptr parent, const char *text) : Control(id, parent)
+Label::Label(const char *id, std::unique_ptr<Control> parent, const char *text) : Control(id, parent)
 {
     // copy text
     _text = std::string(text);
@@ -63,7 +63,7 @@ Label::~Label()
 Label *
 Label::fromHtmlNode(htmlnode &node)
 {
-    unique_page_ptr _Page = GetPage();
+    std::unique_ptr<Page> _Page = GetPage();
     if (_Page == nullptr)
         throw GridException(300, "Control must be attached to a page");
     if (_htmlNode == nullptr)

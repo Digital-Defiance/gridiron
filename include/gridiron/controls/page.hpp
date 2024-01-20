@@ -54,7 +54,7 @@ namespace GridIron
     public:
         Page(std::string frontPage);
 
-        unique_page_ptr This();
+        std::unique_ptr<Page> This();
 
         ~Page();
 

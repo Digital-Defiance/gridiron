@@ -42,9 +42,9 @@ namespace GridIron
         class Label : public Control
         {
         public:
-            Label(const char *id, unique_control_ptr parent);
+            Label(const char *id, std::unique_ptr<Control> parent);
 
-            Label(const char *id, unique_control_ptr parent, const char *text);
+            Label(const char *id, std::unique_ptr<Control> parent, const char *text);
 
             ~Label();
 
