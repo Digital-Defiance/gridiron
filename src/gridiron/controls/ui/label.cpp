@@ -42,14 +42,14 @@ std::string Label::renderTagName() const
     return "div";
 }
 
-Label::Label(const char *id, std::unique_ptr<Control> parent) : Control(id, parent)
+Label::Label(const char *id, std::shared_ptr<Control> parent) : Control(id, parent)
 {
     // nothing extra
     _text = std::string("");
     _defaulttext = true; // text has not been overriden/changed
 }
 
-Label::Label(const char *id, std::unique_ptr<Control> parent, const char *text) : Control(id, parent)
+Label::Label(const char *id, std::shared_ptr<Control> parent, const char *text) : Control(id, parent)
 {
     // copy text
     _text = std::string(text);

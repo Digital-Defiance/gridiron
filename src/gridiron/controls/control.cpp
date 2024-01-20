@@ -75,17 +75,17 @@ namespace GridIron
         return os;
     }
 
-    std::unique_ptr<Control> Control::This()
+    std::shared_ptr<Control> Control::This()
     {
-        return std::unique_ptr<Control>(this);
+        return shared_from_this();
     }
 
     // find the bottom-most control, regardless of type
     // returns: pointer - may be self
-    std::unique_ptr<Control>
+    std::shared_ptr<Control>
     Control::GetRoot(void)
     {
-        std::unique_ptr<Control> ptr = This();
+        std::shared_ptr<Control> ptr = This();
 
         while (ptr->_parent != nullptr)
         {
@@ -97,10 +97,10 @@ namespace GridIron
 
     // fine the bottom-most control, only if a Page object
     // returns: pointer on success or nullptr, may be self
-    std::unique_ptr<Page>
+    std::shared_ptr<Page>
     Control::GetPage(void)
     {
-        std::unique_ptr<Control> ptr = GetRoot();
+        std::shared_ptr<Control> ptr = GetRoot();
         Control *p = ptr.get();
         if (!Page::instanceOf<Page>(p))
             return nullptr;

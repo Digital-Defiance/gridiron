@@ -44,18 +44,19 @@ public:
 
             Action act() override{
 
-                GridIron::Page page("gridiron-demo/testapp.html");
-    GridIron::controls::Label lblTest("lblTest", std::unique_ptr<GridIron::Control>(new GridIron::Page(page)));
-    page.RegisterVariable("lblTest_Text", lblTest.GetTextPtr());
-    lblTest.SetText("these contents were replaced");
+            auto page = std::make_shared<GridIron::Page>("gridiron-demo/testapp.html");
+            GridIron::controls::Label lblTest("lblTest", page);
 
-    std::ostringstream pageContent;
-    pageContent << page;
-    auto response = controller->createResponse(Status::CODE_200, pageContent.str().c_str());
-    response->putHeader("Content-Type", "text/html");
-    return _return(response);
-}
-}
+            page.RegisterVariable("lblTest_Text", lblTest.GetTextPtr());
+            lblTest.SetText("these contents were replaced");
+
+            std::ostringstream pageContent;
+            pageContent << page;
+            auto response = controller->createResponse(Status::CODE_200, pageContent.str().c_str());
+            response->putHeader("Content-Type", "text/html");
+            return _return(response);
+        }
+    }
 ;
 }
 ;

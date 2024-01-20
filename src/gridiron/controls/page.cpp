@@ -126,9 +126,9 @@ Page::Page(std::string frontPageFile) : Control(frontPageFile.c_str(), nullptr)
     //_regvars["__namespace"] = &_namespace;
 }
 
-std::unique_ptr<Page> Page::This()
+std::shared_ptr<Page> Page::This()
 {
-    return std::unique_ptr<Page>(this);
+    return shared_from_this();
 }
 
 Page::~Page()

@@ -44,11 +44,11 @@ namespace GridIron
     class ControlFactoryProxyBase;
 
     // map between control id's and control instances
-    typedef std::map<std::string, std::unique_ptr<Control>> control_map;
+    typedef std::map<std::string, std::shared_ptr<Control>> control_map;
     typedef std::vector<std::shared_ptr<Control>> vector_control_children;
 
     // custom control base class, must derive
-    class Control
+    class Control : public std::enable_shared_from_this<Control> 
     {
     protected:
         Control(const char *id, std::shared_ptr<Control> parent, std::string type); // parent can be page type or control type
@@ -58,11 +58,11 @@ namespace GridIron
         static std::string GetFullName(std::string tag);
 
         virtual ~Control(); // destructor
-        std::unique_ptr<Page>
+        std::shared_ptr<Page>
         GetPage(); // return pointer to parent page object (or self for page)
-        std::unique_ptr<Control>
+        std::shared_ptr<Control>
         GetRoot(); // return pointer to the parent control object, regardless of type.
-        std::unique_ptr<Control> This();
+        std::shared_ptr<Control> This();
 
         std::shared_ptr<Control> Find(Control &control);
 
