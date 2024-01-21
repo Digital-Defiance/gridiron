@@ -30,14 +30,14 @@ namespace GridIron
 {
     const std::string Control::HtmlNamespace = GRIDIRON_XHTML_NS;
 
-    Control::Control(const char *id, std::shared_ptr<Control> parent, std::string type)
+    Control::Control(std::string id, std::shared_ptr<Control> parent)
     {
         std::shared_ptr<Control> result = nullptr;
         std::shared_ptr<Control> _Page;
 
         // INITIALIZE VARIABLES
         // our id
-        _id = std::string(id);
+        _id = id;
         // our parent, as given
         _parent.swap(parent);
         // whether this page should be serialized into the viewstate
@@ -46,7 +46,6 @@ namespace GridIron
         _autonomous = false;
         // this is a pointer to the html Tag associated with this instance
         _htmlNode = nullptr;
-        _type = type;
         // TODO: check types against an allowedTypes virtual method?
 
         // we must have an ID- and only one instance of an id may exist on all controls under a page object
@@ -95,9 +94,9 @@ namespace GridIron
         return ptr;
     }
 
-    // fine the bottom-most control, only if a Page object
+    // find the bottom-most control, only if a Page object
     // returns: pointer on success or nullptr, may be self
-    std::shared_ptr<Page>
+    std::shared_ptr<Control>
     Control::GetPage(void)
     {
         std::shared_ptr<Control> ptr = GetRoot();
@@ -157,6 +156,16 @@ namespace GridIron
     {
         os << GetFullName(this->controlTagName());
         return os;
+    }
+
+    std::string Control::controlTagName() const
+    {
+        return "Control";
+    }
+
+    std::string Control::renderTagName() const
+    {
+        return "div";
     }
 
     // register this control with the parent

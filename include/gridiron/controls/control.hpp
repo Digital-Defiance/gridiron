@@ -48,17 +48,17 @@ namespace GridIron
     typedef std::vector<std::shared_ptr<Control>> vector_control_children;
 
     // custom control base class, must derive
-    class Control : public std::enable_shared_from_this<Control> 
+    class Control : public std::enable_shared_from_this<Control>
     {
     protected:
-        Control(const char *id, std::shared_ptr<Control> parent, std::string type); // parent can be page type or control type
+        Control(std::string id, std::shared_ptr<Control> parent); // parent can be page type or control type
     public:
         static const std::string HtmlNamespace; // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
 
         static std::string GetFullName(std::string tag);
 
         virtual ~Control(); // destructor
-        std::shared_ptr<Page>
+        std::shared_ptr<Control>
         GetPage(); // return pointer to parent page object (or self for page)
         std::shared_ptr<Control>
         GetRoot(); // return pointer to the parent control object, regardless of type.
@@ -116,7 +116,6 @@ namespace GridIron
          */
         htmlnode *_htmlNode; // the associated html node
         std::string _text;
-        std::string _type;
 
         // memory overhead warning...
         static std::map<std::string, std::shared_ptr<Control>> _controlsByID;

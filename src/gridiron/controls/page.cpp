@@ -34,17 +34,7 @@
 
 using namespace GridIron;
 
-std::string Page::controlTagName() const
-{
-    return "Page";
-}
-
-std::string Page::renderTagName() const
-{
-    return "html";
-}
-
-Page::Page(std::string frontPageFile) : Control(frontPageFile.c_str(), nullptr)
+Page::Page(std::string frontPageFile) : Control(frontPageFile, nullptr)
 {
     int filesize = 0;
     int bytesread = 0;

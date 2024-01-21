@@ -66,8 +66,12 @@ namespace GridIron
 
         static const std::string PathToPage(std::string frontPage);
 
-        std::string controlTagName() const override;
-        std::string renderTagName() const override;
+        std::string controlTagName() const override {
+            return "Page";
+        }
+        std::string renderTagName() const override {
+            return "html";
+        }
 
     protected:
         tree<htmlnode> _tree;      // html tree

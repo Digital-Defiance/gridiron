@@ -42,17 +42,17 @@ std::string Label::renderTagName() const
     return "div";
 }
 
-Label::Label(const char *id, std::shared_ptr<Control> parent) : Control(id, parent)
+Label::Label(std::string id, std::shared_ptr<Control> parent) : Control(id, parent)
 {
     // nothing extra
     _text = std::string("");
     _defaulttext = true; // text has not been overriden/changed
 }
 
-Label::Label(const char *id, std::shared_ptr<Control> parent, const char *text) : Control(id, parent)
+Label::Label(std::string id, std::shared_ptr<Control> parent, std::string text) : Control(id, parent)
 {
     // copy text
-    _text = std::string(text);
+    _text = text;
     _defaulttext = false; // text has been overridden/changed
 }
 
@@ -94,7 +94,7 @@ std::ostream &operator<<(std::ostream &os, Label &label)
 {
     label.parse();
     htmlcxx::HTML::Node n;
-    const char *foo = "<div style=\"align: left;\">" + _text.c_str() + "</div>";
+    const char *foo = "<" + this->renderTagName() + " style=\"align: left; height: " + std::to_string(this->_height) + " px; width: " + std::to_string(this->_width) + " px; \" id=\"" + this->id + "\">" + _text.c_str() + "</div>";
     //    return oatpp::String(foo);
 
     return os;

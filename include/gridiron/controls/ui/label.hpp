@@ -42,9 +42,9 @@ namespace GridIron
         class Label : public Control
         {
         public:
-            Label(const char *id, std::shared_ptr<Control> parent);
+            Label(std::string id, std::shared_ptr<Control> parent);
 
-            Label(const char *id, std::shared_ptr<Control> parent, const char *text);
+            Label(std::string id, std::shared_ptr<Control> parent, std::string text);
 
             ~Label();
 
@@ -69,8 +69,12 @@ namespace GridIron
 
             friend std::ostream &operator<<(std::ostream &os, Label &label);
 
-            std::string controlTagName() const override;
-            std::string renderTagName() const override;
+       std::string controlTagName() const override {
+            return "Label";
+        }
+        std::string renderTagName() const override {
+            return "div";
+        }
 
         private:
             bool _defaulttext;
