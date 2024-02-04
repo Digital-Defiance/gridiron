@@ -47,7 +47,7 @@ public:
             auto page = std::make_shared<GridIron::Page>("gridiron-demo/testapp.html");
             GridIron::controls::Label lblTest("lblTest", page);
 
-            page.RegisterVariable("lblTest_Text", lblTest.GetTextPtr());
+            page->RegisterVariable("lblTest_Text", lblTest.GetTextPtr());
             lblTest.SetText("these contents were replaced");
 
             std::ostringstream pageContent;
