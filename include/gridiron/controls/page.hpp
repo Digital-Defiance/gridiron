@@ -1,5 +1,5 @@
 /****************************************************************************************
- * (C) Copyright 2009-2023
+ * (C) Copyright 2009-2024
  *    Jessica Mulein <jessica@digitaldefiance.org>
  *    Digital Defiance and Contributors <https://digitaldefiance.org>
  *
@@ -54,7 +54,7 @@ namespace GridIron
     public:
         Page(std::string frontPage);
 
-        unique_page_ptr This();
+        std::shared_ptr<Page> This();
 
         ~Page();
 
@@ -66,8 +66,12 @@ namespace GridIron
 
         static const std::string PathToPage(std::string frontPage);
 
-        std::string controlTagName() const override;
-        std::string renderTagName() const override;
+        std::string controlTagName() const override {
+            return "Page";
+        }
+        std::string renderTagName() const override {
+            return "html";
+        }
 
     protected:
         tree<htmlnode> _tree;      // html tree

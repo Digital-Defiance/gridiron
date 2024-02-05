@@ -1,9 +1,8 @@
 
-#include "./controller/UserController.hpp"
+#include "./controller/RootController.hpp"
 #include "./AppComponent.hpp"
 
-#include "oatpp-swagger/Controller.hpp"
-#include "oatpp/network/server/Server.hpp"
+#include "oatpp/network/Server.hpp"
 
 #include <iostream>
 
@@ -18,22 +17,13 @@ void run() {
   AppComponent components; // Create scope Environment components
   
   /* create ApiControllers and add endpoints to router */
-  
   auto router = components.httpRouter.getObject();
-  auto docEndpoints = oatpp::swagger::Controller::Endpoints::createShared();
-  
-  auto userController = UserController::createShared();
-  userController->addEndpointsToRouter(router);
-  
-  docEndpoints->pushBackAll(userController->getEndpoints());
-  
-  auto swaggerController = oatpp::swagger::Controller::createShared(docEndpoints);
-  swaggerController->addEndpointsToRouter(router);
-  
+
+  router->addController(RootController::createShared());
+
   /* create server */
-  
-  oatpp::network::server::Server server(components.serverConnectionProvider.getObject(),
-                                        components.serverConnectionHandler.getObject());
+  oatpp::network::Server server(components.serverConnectionProvider.getObject(),
+                                components.serverConnectionHandler.getObject());
   
   OATPP_LOGD("Server", "Running on port %s...", components.serverConnectionProvider.getObject()->getProperty("port").toString()->c_str());
   

@@ -10,12 +10,8 @@ set(GRIDIRON_DEMO_SOURCE_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 set(GRIDIRON_DEMO_SOURCES
     ${GRIDIRON_DEMO_SOURCE_ROOT}/App.cpp
     ${GRIDIRON_DEMO_SOURCE_ROOT}/AppComponent.hpp
-    ${GRIDIRON_DEMO_SOURCE_ROOT}/SwaggerComponent.hpp
-    ${GRIDIRON_DEMO_SOURCE_ROOT}/controller/UserController.hpp
-    ${GRIDIRON_DEMO_SOURCE_ROOT}/db/Database.cpp
-    ${GRIDIRON_DEMO_SOURCE_ROOT}/db/Database.hpp
-    ${GRIDIRON_DEMO_SOURCE_ROOT}/db/model/User.hpp
-    ${GRIDIRON_DEMO_SOURCE_ROOT}/dto/UserDto.hpp
+    ${GRIDIRON_DEMO_SOURCE_ROOT}/controller/RootController.cpp
+    ${GRIDIRON_DEMO_SOURCE_ROOT}/controller/RootController.hpp
 )
 
 add_subdirectory(gridiron)

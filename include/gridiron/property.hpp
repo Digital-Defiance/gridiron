@@ -1,5 +1,5 @@
 /****************************************************************************************
- * (C) Copyright 2009-2023
+ * (C) Copyright 2009-2024
  *    Jessica Mulein <jessica@digitaldefiance.org>
  *    Digital Defiance and Contributors <https://digitaldefiance.org>
  *

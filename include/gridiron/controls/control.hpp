@@ -1,5 +1,5 @@
 /****************************************************************************************
- * (C) Copyright 2009-2023
+ * (C) Copyright 2009-2024
  *    Jessica Mulein <jessica@digitaldefiance.org>
  *    Digital Defiance and Contributors <https://digitaldefiance.org>
  *
@@ -29,7 +29,6 @@
 #include <iostream>
 #include <fstream>
 #include <gridiron/exceptions.hpp>
-#include <gridiron/controls/page.hpp>
 #include <sstream>
 #include <vector>
 #include <map>
@@ -44,27 +43,25 @@ namespace GridIron
     class ControlFactoryProxyBase;
 
     // map between control id's and control instances
-    typedef std::unique_ptr<Control> unique_control_ptr;
-    typedef std::unique_ptr<Page> unique_page_ptr;
-    typedef std::map<std::string, unique_control_ptr> control_map;
+    typedef std::map<std::string, std::shared_ptr<Control>> control_map;
     typedef std::vector<std::shared_ptr<Control>> vector_control_children;
 
     // custom control base class, must derive
-    class Control
+    class Control : public std::enable_shared_from_this<Control>
     {
     protected:
-        Control(const char *id, std::shared_ptr<Control> parent, std::string type); // parent can be page type or control type
+        Control(std::string id, std::shared_ptr<Control> parent); // parent can be page type or control type
     public:
         static const std::string HtmlNamespace; // gridiron namespace so it can be accessed as a regvar (needs pointed to string)
 
         static std::string GetFullName(std::string tag);
 
         virtual ~Control(); // destructor
-        unique_page_ptr
+        std::shared_ptr<Control>
         GetPage(); // return pointer to parent page object (or self for page)
-        unique_control_ptr
+        std::shared_ptr<Control>
         GetRoot(); // return pointer to the parent control object, regardless of type.
-        unique_control_ptr This();
+        std::shared_ptr<Control> This();
 
         std::shared_ptr<Control> Find(Control &control);
 
@@ -118,7 +115,6 @@ namespace GridIron
          */
         htmlnode *_htmlNode; // the associated html node
         std::string _text;
-        std::string _type;
 
         // memory overhead warning...
         static std::map<std::string, std::shared_ptr<Control>> _controlsByID;

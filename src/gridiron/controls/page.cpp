@@ -1,5 +1,5 @@
 /****************************************************************************************
- * (C) Copyright 2009-2023
+ * (C) Copyright 2009-2024
  *    Jessica Mulein <jessica@digitaldefiance.org>
  *    Digital Defiance and Contributors <https://digitaldefiance.org>
  *
@@ -34,17 +34,7 @@
 
 using namespace GridIron;
 
-std::string Page::controlTagName() const
-{
-    return "Page";
-}
-
-std::string Page::renderTagName() const
-{
-    return "html";
-}
-
-Page::Page(std::string frontPageFile) : Control(frontPageFile.c_str(), nullptr)
+Page::Page(std::string frontPageFile) : Control(frontPageFile, nullptr)
 {
     int filesize = 0;
     int bytesread = 0;
@@ -126,9 +116,9 @@ Page::Page(std::string frontPageFile) : Control(frontPageFile.c_str(), nullptr)
     //_regvars["__namespace"] = &_namespace;
 }
 
-unique_page_ptr Page::This()
+std::shared_ptr<Page> Page::This()
 {
-    return std::unique_ptr<Page>(this);
+    return shared_from_this();
 }
 
 Page::~Page()
@@ -343,6 +333,7 @@ std::ostream &operator<<(std::ostream &os, const Control &control)
     // assemble page: start by rendering the first node.
     tree<htmlnode>::sibling_iterator sib = _tree.begin();
     renderNode(&sib, 1, data);
+    return os;
 }
 
 // for controls to make variables available for HTML replacement. alphanumeric and _ only.
